@@ -15,7 +15,7 @@ public class MyClientGUI extends JFrame{
 	String messages = "";
 	public MyClientGUI(){
 		super("My Client");
-		this.setBounds(50, 50, 500, 500);
+		this.setBounds(50, 50, 600, 600);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setVisible(true);
 		this.setLayout(null);
@@ -32,15 +32,15 @@ public class MyClientGUI extends JFrame{
 		btnDisconnect = new JButton("DisConnet");
 		this.addView(btnDisconnect, 370, 50, 100, 20);
 		txtSend = new JTextField();
-		this.addView(txtSend,45, 350, 310, 30);
+		this.addView(txtSend,45, 450, 310, 30);
 		btnSend = new JButton("Send");
-		this.addView(btnSend, 350, 350, 100, 30);
+		this.addView(btnSend, 350, 450, 100, 30);
 		labelMessage = new JLabel("Messages:");
 		this.addView(labelMessage, 50, 120, 100, 20);
 		txtMessage = new JTextArea();
 		txtMessage.setEditable(false);
 		JScrollPane scroll = new JScrollPane (txtMessage);
-		this.addView(scroll, 50, 150, 300, 200);
+		this.addView(scroll, 50, 150, 500, 300);
 		scroll.setVerticalScrollBarPolicy ( ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS );
 		
 		btnConnect.addActionListener(new ActionListener(){

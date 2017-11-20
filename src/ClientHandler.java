@@ -9,11 +9,13 @@ public class ClientHandler implements Runnable {
 	private Socket socket;
     private int id;
     private MyServer myServer;
-
+    private MyDB mydb;
+    PrintWriter out;
     public ClientHandler(Socket socket, int id, MyServer myServer) {
         this.socket = socket;
         this.id = id;
         this.myServer=myServer;
+        mydb = myServer.mydb;
     }
 
 	@Override
@@ -24,7 +26,7 @@ public class ClientHandler implements Runnable {
             BufferedReader in = new BufferedReader(isr);
            
             // (outputstream, autoflush)
-            PrintWriter out = new PrintWriter(socket.getOutputStream(),true);
+            out = new PrintWriter(socket.getOutputStream(),true);
 
             // Send a welcome message to the client.
             out.println("#"+id);
@@ -43,6 +45,7 @@ public class ClientHandler implements Runnable {
                 //here to deal with the input msg and call function
                 
                 System.out.println("Message from client #" + id + ", [" + msg + "]");
+                inputmsgHandler(msg);
                 myServer.userInputs.add(msg);
                 myServer.updateText();
             }
@@ -59,5 +62,20 @@ public class ClientHandler implements Runnable {
 		
 		
 	}
+	
+	/*
+	 * *
+	 * input string Handler write here
+	 */
+	public void inputmsgHandler(String msg){
+		
+		
+		
+		out.println("your input is not valid, please double check");
+		
+	}
+	
+	
+	
 
 }
