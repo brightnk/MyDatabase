@@ -19,7 +19,7 @@ public class MyDB{
 	//for user login check, return null if no record find
 	public User login(String name, String password){
 		for(User user: users){
-			if(user.name ==name &&user.password==password) return user;
+			if(user.name.equals(name) &&user.password.equals(password)) return user;
 		}
 		return null;
 	}
@@ -39,7 +39,7 @@ public class MyDB{
 		
 		if(currentUser.isAdmin){
 			for(User myUser: users){
-				if(myUser.name ==user.name &&myUser.password==user.password){
+				if(myUser.name.equals(user.name) &&myUser.password.equals(user.password)){
 					users.remove(myUser);
 					System.out.println("delete 1 user successfully");
 					return;
@@ -58,7 +58,7 @@ public class MyDB{
 		
 		if(currentUser.isAdmin){
 			for(User myUser: users){
-				if(myUser.name ==olduser.name &&myUser.password==olduser.password){
+				if(myUser.name.equals(olduser.name) &&myUser.password.equals(olduser.password)){
 					myUser = updatedUser;
 					System.out.println("update 1 user successfully");
 					return;
@@ -77,7 +77,7 @@ public class MyDB{
 		
 		if(currentUser.isAdmin){
 			for(Db db:dbs){
-				if(db.dbName==name){
+				if(db.dbName.equals(name)){
 					System.out.println("The db name is already existing, please change");
 					return;
 				}
@@ -92,7 +92,7 @@ public class MyDB{
 	public void removeDB(User currentUser, String name) {
 		if(currentUser.isAdmin){
 			for(Db db:dbs){
-				if(db.dbName==name){
+				if(db.dbName.equals(name)){
 					dbs.remove(db);
 					return;
 				}
@@ -108,7 +108,7 @@ public class MyDB{
 	
 	public User.UserDBAction useDB(String name) {
 		for(Db db:dbs){
-			if(db.dbName==name){
+			if(db.dbName.equals(name)){
 				return db;
 			}
 		}
@@ -138,7 +138,7 @@ class Db implements User.UserDBAction{
 	@Override
 	public void addTable(String tableName, ArguSet... args) {
 		for(Table table:tables){
-			if(table.tableName==tableName){
+			if(table.tableName.equals(tableName)){
 				System.out.println("The table is already existing, please change name");
 				return;
 			}
@@ -150,7 +150,7 @@ class Db implements User.UserDBAction{
 	@Override
 	public void removeTable(String name) {
 		for(Table table:tables){
-			if(table.tableName==name){
+			if(table.tableName.equals(name)){
 				tables.remove(table);
 				return;
 			}
@@ -162,7 +162,7 @@ class Db implements User.UserDBAction{
 	@Override
 	public Table useTable(String name) {
 		for(Table table:tables){
-			if(table.tableName==name){
+			if(table.tableName.equals(name)){
 				
 				return table;
 			}

@@ -47,14 +47,15 @@ public class MyClientGUI extends JFrame{
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+				String username = txtUserName.getText();
+				String password = txtPW.getText();
 				if(myclient ==null){
 					
 					messages ="";
 					
 						try {
-							myclient = new MyClient(MyClientGUI.this);
-							messages +="Connection made \n";
+							myclient = new MyClient(MyClientGUI.this, username, password);
+							messages +="Connection made, try login.. \n";
 							myclient.start();
 							
 							

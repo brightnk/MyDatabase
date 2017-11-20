@@ -5,11 +5,13 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 public class ClientHandler implements Runnable {
-
+	public final static String WELCOMEWORD = "JDB-->";
 	private Socket socket;
     private int id;
     private MyServer myServer;
     private MyDB mydb;
+    private boolean loginOK = false;
+    private User currentUser;
     PrintWriter out;
     public ClientHandler(Socket socket, int id, MyServer myServer) {
         this.socket = socket;
@@ -24,19 +26,24 @@ public class ClientHandler implements Runnable {
 		try {
 			InputStreamReader isr = new InputStreamReader(socket.getInputStream());
             BufferedReader in = new BufferedReader(isr);
-           
-            // (outputstream, autoflush)
             out = new PrintWriter(socket.getOutputStream(),true);
-
+           String username=in.readLine();
+           String password=in.readLine();
+           System.out.println(username+" "+password);
+           currentUser = mydb.login(username, password);
+           if(currentUser==null) out.println(WELCOMEWORD+"log in failed, please check your input");
+           
+           else{
+            // (outputstream, autoflush)
+            loginOK=true;
             // Send a welcome message to the client.
-            out.println("#"+id);
-            out.println("Welcome Client # " + id);
-            out.println("Enter @ to quit");
-            
+            out.println(WELCOMEWORD+"Welcome User: " + currentUser.name);
+            out.println(WELCOMEWORD+"Enter @ to quit");
+           }
 
             String msg;
             // waiting for client to send message
-            while (true) {
+            while (loginOK) {
                 msg = in.readLine();
                 if (msg == null || msg.equals("@")) {
                     break;
@@ -63,6 +70,8 @@ public class ClientHandler implements Runnable {
 		
 	}
 	
+	
+	
 	/*
 	 * *
 	 * input string Handler write here
@@ -71,7 +80,7 @@ public class ClientHandler implements Runnable {
 		
 		
 		
-		out.println("your input is not valid, please double check");
+		out.println(WELCOMEWORD+"your input is not valid, please double check");
 		
 	}
 	

@@ -15,7 +15,7 @@ public class MyClient extends Thread
 	private int id;
 	public boolean ok_connect = true;
 	
-	public MyClient(MyClientGUI gui) throws UnknownHostException, IOException {
+	public MyClient(MyClientGUI gui, String username, String password) throws UnknownHostException, IOException {
 		this.myGui = gui;
 		String hostname = DBConfig.HOSTNAME;
 		int port = DBConfig.PORT;
@@ -25,6 +25,8 @@ public class MyClient extends Thread
 		InputStreamReader isr = new InputStreamReader(connectionSock.getInputStream());
 		serverInput = new BufferedReader(isr);
 		pw = new PrintWriter(connectionSock.getOutputStream(),true);
+		pw.println(username);
+		pw.println(password);
 	}
 	
 	public void close() throws IOException {
@@ -40,13 +42,12 @@ public class MyClient extends Thread
 		String serverMsg;
 		// used to listen message from server
 		try {
-			serverMsg = serverInput.readLine(); // assume that the id was the first message sent
-			id = Integer.parseInt(serverMsg.split("#")[1].trim()); 
+			
 			while(true) {
 				serverMsg = serverInput.readLine(); 
 				if (serverMsg == null)
 					break;
-				myGui.messages += "Client# " + id + ", Received: " + serverMsg +"\n";
+				myGui.messages += serverMsg +"\n";
 				myGui.updateMessage();
 			}
 		} catch (Exception ex) {
