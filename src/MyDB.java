@@ -1,14 +1,17 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
-public class MyDB implements User.UserAdminAction{
-	
-	private ArrayList<User> users =new ArrayList<User>();
-	ArrayList<Db> dbs = new ArrayList<Db>();
-	
+import org.json.*;
+public class MyDB{
+	static boolean DBwritable = true;
+	ArrayList<User> users =new ArrayList<User>();
+	ArrayList<Db> dbs = new ArrayList<Db>();	
+
 	public MyDB(){
 		
-		User defaultUser = new User("admin", "admin", true, this);
+		User defaultUser = new User("admin", "admin", true);
 		users.add(defaultUser);
 	}
 	
@@ -22,66 +25,105 @@ public class MyDB implements User.UserAdminAction{
 	}
 	
 	
-	@Override
-	public void addUser(User user){
-		if(login(user.name, user.password)==null) users.add(user);
-		else System.out.println("user already exist");
+	
+	public void addUser(User currentUser, User user){
+		if(currentUser.isAdmin){
+			if(login(user.name, user.password)==null) users.add(user);
+			else System.out.println("user already exist");
+		}else System.out.println("not admin");
 	}
 
 
-	@Override
-	public void deleteUser(User user) {
-		for(User myUser: users){
-			if(myUser.name ==user.name &&myUser.password==user.password){
-				users.remove(myUser);
-				System.out.println("delete 1 user successfully");
-				return;
+	
+	public void deleteUser(User currentUser, User user) {
+		
+		if(currentUser.isAdmin){
+			for(User myUser: users){
+				if(myUser.name ==user.name &&myUser.password==user.password){
+					users.remove(myUser);
+					System.out.println("delete 1 user successfully");
+					return;
+				}
 			}
-		}
-		System.out.print("no user found");
+			System.out.print("no user found");
+		}else System.out.println("not admin");
+		
+		
 		
 	}
 
 
-	@Override
-	public void updateUser(User olduser, User updatedUser) {
-		for(User myUser: users){
-			if(myUser.name ==olduser.name &&myUser.password==olduser.password){
-				myUser = updatedUser;
-				System.out.println("update 1 user successfully");
-				return;
+
+	public void updateUser(User currentUser, User olduser, User updatedUser) {
+		
+		if(currentUser.isAdmin){
+			for(User myUser: users){
+				if(myUser.name ==olduser.name &&myUser.password==olduser.password){
+					myUser = updatedUser;
+					System.out.println("update 1 user successfully");
+					return;
+				}
 			}
-		}
-		System.out.print("no user found");
+			System.out.print("no user found");
+		}else System.out.println("not admin");
+		
+		
+		
 	}
 
 
-	@Override
-	public void createDB(String name) {
+	
+	public void createDB(User currentUser, String name) {
+		
+		if(currentUser.isAdmin){
+			for(Db db:dbs){
+				if(db.dbName==name){
+					System.out.println("The db name is already existing, please change");
+					return;
+				}
+			}
+			dbs.add(new Db(name));
+		}else System.out.println("not admin");
+		
+	}
+
+
+	
+	public void removeDB(User currentUser, String name) {
+		if(currentUser.isAdmin){
+			for(Db db:dbs){
+				if(db.dbName==name){
+					dbs.remove(db);
+					return;
+				}
+			}
+			System.out.println("The db name is not exsiting");
+		}else System.out.println("not admin");
+		
+		
+		
+	}
+
+
+	
+	public User.UserDBAction useDB(String name) {
 		for(Db db:dbs){
 			if(db.dbName==name){
-				System.out.println("The db name is already existing, please change");
-				return;
+				return db;
 			}
 		}
-		dbs.add(new Db(name));
+		System.out.println("The db name is not exsiting");
+		return null;
 	}
-
-
-	@Override
-	public void removeDB(String name) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	
-	
-	
 	
 }
 
 
-class Db{
+
+
+
+//Database class
+class Db implements User.UserDBAction{
 	static int LASTID =0;
 	int dbId;
 	String dbName;
@@ -91,18 +133,212 @@ class Db{
 		LASTID++;
 		this.dbId = LASTID;
 		this.dbName = name;
+	}
+
+	@Override
+	public void addTable(String tableName, ArguSet... args) {
+		for(Table table:tables){
+			if(table.tableName==tableName){
+				System.out.println("The table is already existing, please change name");
+				return;
+			}
+		}
+		tables.add(new Table(tableName, args));
+
+	}
+
+	@Override
+	public void removeTable(String name) {
+		for(Table table:tables){
+			if(table.tableName==name){
+				tables.remove(table);
+				return;
+			}
+		}
+		System.out.println("The table name is not exsiting");
+
+	}
+
+	@Override
+	public Table useTable(String name) {
+		for(Table table:tables){
+			if(table.tableName==name){
+				
+				return table;
+			}
+		}
+		System.out.println("The table name is not exsiting");
+		return null;
 	};
 	
 	
 	
 }
 
-class Table{
+class Table implements User.UserTableAction{
+	static int LASTID =0;
+	int recordID=0;
 	int tableId;
 	String tableName;
-	LinkedHashMap<String, Object> recordMeta = new LinkedHashMap<String, Object>();
+	Map<String, DataType> recordMeta = new LinkedHashMap<String, DataType>();
 	ArrayList<String> recordsTxt = new ArrayList<String>();
 	
-	public Table(){};
+	public Table(String name, ArguSet...arguSets){
+		LASTID++;
+		tableId=LASTID;
+		this.tableName=name;
+		for(ArguSet arguSet:arguSets){
+			recordMeta.put(arguSet.name, new DataType(arguSet.type, arguSet.length));
+		}		
+	};
+	
+	@Override
+	public void insertRecord(HashMap<String, String> insertMap) {
+		 this.recordID++;
+		 String fieldname;
+		 String insertString = "{id:"+recordID;
+		 try{
+			for(Map.Entry<String, DataType> entry: recordMeta.entrySet()){
+				fieldname = entry.getKey();
+				String insertValue = insertMap.get(fieldname);
+				String metaType = entry.getValue().type;
+				int metaLength = entry.getValue().length;
+				typeCheck(metaType, insertValue);
+				if(insertValue.length()>metaLength) throw new Exception();
+				else{
+					
+					insertString += ", "+fieldname+": "+insertValue;
+					
+				}
+			}
+			insertString +="}";
+			recordsTxt.add(insertString);
+		 }catch(Exception e){
+			 this.recordID--;
+			 System.out.println(e.getMessage());
+		 }
+
+	}
+	public void typeCheck(String type, String insertValue){
+		switch(type){
+			case "INT": Integer.parseInt(insertValue);
+				break;
+			case "String":
+				break;
+			case "Double": Double.parseDouble(insertValue);
+				break;
+		}
+	}
+
+
+	
+	@Override
+	public ArrayList<String> searchRecord(Condition condition) {
+		ArrayList<String> afterSearch =new ArrayList<String>();
+		JSONObject myJson;
+		for(String record: recordsTxt){
+			try {
+				myJson = new JSONObject(record);
+				switch(condition.comparer){
+					case ">": if(myJson.getString(condition.fieldName).compareTo(condition.condition)>0) afterSearch.add(record);
+						break;
+					case "<":if(myJson.getString(condition.fieldName).compareTo(condition.condition)<0) afterSearch.add(record);
+						break;
+					case "=":if(myJson.getString(condition.fieldName).compareTo(condition.condition)==0) afterSearch.add(record);
+						break;
+				}
+				
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+		
+		return afterSearch;
+		
+	}
+
+
+
+
+	@Override
+	public void updateRecord(String fieldName, String newValue, Condition condition) {
+		JSONObject myJson;
+		for(String record: recordsTxt){
+			try {
+				myJson = new JSONObject(record);
+				switch(condition.comparer){
+					case ">": if(myJson.getString(condition.fieldName).compareTo(condition.condition)>0){
+						myJson.put(fieldName,newValue);
+						record = myJson.toString();
+					}
+						break;
+					case "<":if(myJson.getString(condition.fieldName).compareTo(condition.condition)<0) {
+						myJson.put(fieldName,newValue);
+						record = myJson.toString();
+					}
+						break;
+					case "=":if(myJson.getString(condition.fieldName).compareTo(condition.condition)==0) {
+						myJson.put(fieldName,newValue);
+						record = myJson.toString();
+					}
+						break;
+				}
+				
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+		
+	}
+
+
+
+	@Override
+	public void deleteRecord(Condition condition) {
+		JSONObject myJson;
+		for(String record: recordsTxt){
+			try {
+				myJson = new JSONObject(record);
+				switch(condition.comparer){
+					case ">": if(myJson.getString(condition.fieldName).compareTo(condition.condition)>0) recordsTxt.remove(record);
+						break;
+					case "<":if(myJson.getString(condition.fieldName).compareTo(condition.condition)<0) recordsTxt.remove(record);
+						break;
+					case "=":if(myJson.getString(condition.fieldName).compareTo(condition.condition)==0) recordsTxt.remove(record);
+						break;
+				}
+				
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+		
+	}
+	
+	
+
+	class DataType{
+		String type;
+		int length;
+		public DataType(String type, int length){
+			this.type=type;
+			this.length=length;
+		}
+	}
+
+
+
+
+
+
+
+	
+	
 	
 }

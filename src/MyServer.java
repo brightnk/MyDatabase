@@ -1,16 +1,27 @@
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
 
 import javax.swing.*;
+import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
 
 public class MyServer extends JFrame{
 	
+	
+	static final String DBFILENAME = "mydb.json";
 	JLabel labelPort, labelReceive, labelResult;
 	JTextField txtPort;
 	JTextArea txtReceive, txtResult;
@@ -18,6 +29,7 @@ public class MyServer extends JFrame{
 	ServerSocket serverSock = null;
 	Thread server;
 	ArrayList<String> userInputs = new ArrayList<String>();
+	MyDB mydb;
 	
 	public MyServer(){
 		super("My Server");
@@ -57,6 +69,7 @@ public class MyServer extends JFrame{
 				// TODO Auto-generated method stub
 				
 				int port = DBConfig.PORT;
+				//check if already online
 				if(serverSock != null){
 					try {
 						serverSock.close() ;
@@ -67,6 +80,8 @@ public class MyServer extends JFrame{
 						exp.printStackTrace();
 					}
 				}
+				
+				connectDBfile();
 				
 			    server = new Thread(){
 			    	public void run(){
@@ -105,6 +120,36 @@ public class MyServer extends JFrame{
 	    });
 		
 		
+	}
+	
+	//read from DBfile or create one if not exists
+	public void connectDBfile(){
+		File dbfile = new File(DBFILENAME);
+		Gson gson = new Gson(); 
+		if(dbfile.exists()&&!dbfile.isDirectory()){
+			
+			try {
+				JsonReader reader = new JsonReader(new FileReader(DBFILENAME));
+				mydb = gson.fromJson(reader, MyDB.class);
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}else{
+			mydb = new MyDB();		
+			String mydbTxt =gson.toJson(mydb);
+			System.out.println(mydbTxt);
+			try {
+				MyDB.DBwritable=false;
+				BufferedWriter out = new BufferedWriter(new FileWriter(DBFILENAME));
+				out.write(mydbTxt);
+				out.close();
+				MyDB.DBwritable=true;
+			} catch (Exception e) {
+			  e.printStackTrace();
+			}
+		}
 	}
 	
 	public void addView(Component comp, int x, int y, int w, int h){
