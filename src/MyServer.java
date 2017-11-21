@@ -21,7 +21,6 @@ import com.google.gson.stream.JsonReader;
 public class MyServer extends JFrame{
 	
 	
-	static final String DBFILENAME = "mydb.json";
 	JLabel labelPort, labelReceive, labelResult;
 	JTextField txtPort;
 	JTextArea txtReceive, txtResult;
@@ -81,7 +80,8 @@ public class MyServer extends JFrame{
 					}
 				}
 				
-				connectDBfile();
+				
+				DBHelper.connectToDB(mydb);
 				
 			    server = new Thread(){
 			    	public void run(){
@@ -122,35 +122,6 @@ public class MyServer extends JFrame{
 		
 	}
 	
-	//read from DBfile or create one if not exists
-	public void connectDBfile(){
-		File dbfile = new File(DBFILENAME);
-		Gson gson = new Gson(); 
-		if(dbfile.exists()&&!dbfile.isDirectory()){
-			
-			try {
-				JsonReader reader = new JsonReader(new FileReader(DBFILENAME));
-				mydb = gson.fromJson(reader, MyDB.class);
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-		}else{
-			mydb = new MyDB();		
-			String mydbTxt =gson.toJson(mydb);
-			System.out.println(mydbTxt);
-			try {
-				MyDB.DBwritable=false;
-				BufferedWriter out = new BufferedWriter(new FileWriter(DBFILENAME));
-				out.write(mydbTxt);
-				out.close();
-				MyDB.DBwritable=true;
-			} catch (Exception e) {
-			  e.printStackTrace();
-			}
-		}
-	}
 	
 	public void addView(Component comp, int x, int y, int w, int h){
 		
@@ -179,11 +150,15 @@ public class MyServer extends JFrame{
 	    	results += Integer.toString(numbers.get(i))+ "\n";
 	    }
 		txtResult.setText(results);
-		
-		
-		
-		
 	}
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	
