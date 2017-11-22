@@ -11,7 +11,7 @@ public class MyClient extends Thread
 	private MyClientGUI myGui; 
 	private BufferedReader serverInput = null ;
 	private PrintWriter pw = null;
-	private Socket connectionSock = null;
+	public Socket connectionSock = null;
 	private int id;
 	public boolean ok_connect = true;
 	
@@ -30,6 +30,7 @@ public class MyClient extends Thread
 	}
 	
 	public void close() throws IOException {
+		pw.println("@");
 		pw.close();
 		serverInput.close();
 		connectionSock.close();
@@ -47,6 +48,10 @@ public class MyClient extends Thread
 				serverMsg = serverInput.readLine(); 
 				if (serverMsg == null)
 					break;
+				else if(serverMsg.equals("requestCLOSECLIENTsocket")){
+					this.close();
+					break;
+				}
 				myGui.messages += serverMsg +"\n";
 				myGui.updateMessage();
 			}

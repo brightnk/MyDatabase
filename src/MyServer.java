@@ -81,7 +81,7 @@ public class MyServer extends JFrame{
 				}
 				
 				
-				DBHelper.connectToDB(mydb);
+				mydb = DBHelper.connectToDB();
 				
 			    server = new Thread(){
 			    	public void run(){
@@ -152,16 +152,7 @@ public class MyServer extends JFrame{
 		txtResult.setText(results);
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		new MyServer();

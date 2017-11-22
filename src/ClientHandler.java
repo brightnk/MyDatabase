@@ -30,11 +30,18 @@ public class ClientHandler implements Runnable {
            String username=in.readLine();
            String password=in.readLine();
            System.out.println(username+" "+password);
-           currentUser = mydb.login(username, password);
-           if(currentUser==null) out.println(WELCOMEWORD+"log in failed, please check your input");
+           this.currentUser = mydb.login(username, password);
+           
+           
+           if(currentUser==null) {
+        	   out.println(WELCOMEWORD+"log in failed, please check your input");
+        	   out.println("requestCLOSECLIENTsocket");
+           }
            
            else{
-            // (outputstream, autoflush)
+            // Link the reference. JSON only deserialize to be object from the file, not ref.
+        	if(currentUser.selectedDBname!=null) currentUser.selectedDB = mydb.useDB(currentUser.selectedDBname, out);
+        	if(currentUser.selectedTableName!=null) currentUser.selectedTable = currentUser.useTable(currentUser.selectedTableName, out);
             loginOK=true;
             // Send a welcome message to the client.
             out.println(WELCOMEWORD+"Welcome User: " + currentUser.name);
@@ -44,14 +51,14 @@ public class ClientHandler implements Runnable {
             String msg;
             // waiting for client to send message
             while (loginOK) {
-                msg = in.readLine();
+                msg = in.readLine().trim();
                 if (msg == null || msg.equals("@")) {
                     break;
                 }
                 
                 //here to deal with the input msg and call function
                 
-                System.out.println("Message from client #" + id + ", [" + msg + "]");
+                System.out.println("Message from client #" + currentUser.name + ", [" + msg + "]");
                 inputmsgHandler(msg);
                 myServer.userInputs.add(msg);
                 myServer.updateText();
@@ -60,6 +67,7 @@ public class ClientHandler implements Runnable {
             System.out.println("Error client# " + id + ": " + e);
         } finally {
             try {
+            	
                 socket.close();
             } catch (IOException e) {
                 System.out.println("Client # :" + id + " ... Couldn't close a socket");
@@ -78,10 +86,98 @@ public class ClientHandler implements Runnable {
 	 */
 	public void inputmsgHandler(String msg){
 		
+		String[] commands = msg.split(" ");
+		
+		try{
+		switch(commands[0].toLowerCase()){		
+		case "create":
+				switch(commands[1].toLowerCase()){
+				//create user - command: create user (username) (password) (boolean isadmin);
+				case "user":boolean isadmin = Boolean.parseBoolean(commands[4]);
+							mydb.addUser(this.currentUser, new User(commands[2],commands[3],isadmin), out);
+					break;
+				//create database -command: create database (databaseName)
+				case "database": mydb.createDB(this.currentUser, commands[2], out);
+					break;
+				//create table -command: create table (tableName) (fieldName:fieldtype(length)),(fieldName2:fieldtype2(length2))...
+				case "table" :
+					String tableName = commands[2];
+					String inputargs = commands[3];
+					String[] totalArgs = inputargs.split(",");
+					String[] arg;
+					ArguSet[] newArguSet = new ArguSet[totalArgs.length];
+					for(int i=0; i<totalArgs.length;i++){
+						arg = totalArgs[i].split("[:\\(\\)]");
+						newArguSet[i] = new ArguSet();
+						newArguSet[i].name = arg[0];
+						newArguSet[i].type = arg[1];
+						System.out.println(arg[2]);
+						newArguSet[i].length = Integer.parseInt(arg[2]);
+					}
+					this.currentUser.createTable(tableName, out, newArguSet);
+
+					break;
+				
+				}
+			break;
+			
+		case "delete":
+				switch(commands[1].toLowerCase()){
+				//delete user - command: delete user (username)
+				case "user": mydb.deleteUser(this.currentUser, commands[2], out);
+					break;
+					
+				//delete user - command: delete database (databaseName);
+				case "database": mydb.deleteDB(this.currentUser, commands[2], out);
+					break;
+				//delete table - command: delete table (tableName);
+				case "table":
+					if(currentUser.selectedTableName.equals(commands[2])){
+						currentUser.selectedTable=null;
+						currentUser.selectedTableName=null;
+					}
+					currentUser.removeTable(commands[2],out);
+					
+				}
+			break;
+			
+			
+		case "use":
+			switch(commands[1].toLowerCase()){
+			//use database - command: use database (databaseName)
+			case "database":
+				currentUser.selectedDB = mydb.useDB(commands[2], out);
+				if(currentUser.selectedDB!=null) currentUser.selectedDBname = commands[2];
+					break;
+					
+			case "table":
+				currentUser.selectedTable = currentUser.useTable(commands[2], out);
+			}
+		case "select":
+			break;
+		case "insert":
+			break;
+			
+		case "update":
+				switch(commands[1].toLowerCase()){
+				//update user - command: update user (username) with (newUsername) (newPassword) (boolean isAdmin)
+				case "user":
+					boolean isadmin = Boolean.parseBoolean(commands[6]); 
+					mydb.updateUser(this.currentUser, commands[2], new User(commands[4],commands[5],isadmin), out);
+					break;
+				}
+			break;
 		
 		
-		out.println(WELCOMEWORD+"your input is not valid, please double check");
 		
+		
+		}
+		
+		DBHelper.writeToDB(mydb);
+		
+		}catch(Exception e){
+			out.println(WELCOMEWORD+"your input is not valid, please double check");
+		}
 	}
 	
 	

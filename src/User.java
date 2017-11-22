@@ -1,3 +1,4 @@
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -9,6 +10,8 @@ public class User{
 	String name;
 	String password;
 	boolean isAdmin;
+	String selectedDBname;
+	String selectedTableName;
 	UserDBAction selectedDB;
 	UserTableAction selectedTable;
 	
@@ -63,22 +66,30 @@ public class User{
 	 *   methods working on db level before enter into tables 
 	 * 
 	 */
-	private void createTable(String tableName, ArguSet...args){
+	public void createTable(String tableName, PrintWriter out, ArguSet...args){
 		if(selectedDB !=null){
-			selectedDB.addTable(tableName, args);
+			selectedDB.addTable(tableName, out,args );
+		}else{
+			out.println("please select db first");
 		}
 	}
 	
-	private void removeTable(String name){
+	public void removeTable(String name, PrintWriter out){
 		if(selectedDB !=null){
-			selectedDB.removeTable(name);
+			selectedDB.removeTable(name, out);
+		}else{
+			out.println("please select db first");
 		}
 	}
 	
-	private void useTable(String name){
+	public UserTableAction useTable(String name, PrintWriter out){
 		if(selectedDB !=null){
-			selectedTable =selectedDB.useTable(name);
+			selectedTable =selectedDB.useTable(name, out);
+			if(selectedTable!=null) this.selectedTableName=name;
+			return selectedTable;
 		}
+		out.println("please select db first");
+		return null;
 	}
 	
 	/*
@@ -86,15 +97,15 @@ public class User{
 	 * 
 	 */
 	
-	private void insertRecord(HashMap<String, String> insertMap){
+	public void insertRecord(HashMap<String, String> insertMap){
 		selectedTable.insertRecord(insertMap);
 	}
 	//search from all db records string, assume 1 condition only
-	private void searchRecord(Condition condition){
+	public void searchRecord(Condition condition){
 		selectedTable.searchRecord(condition);
 	}
 	
-	private void updateUser(String fieldName, String newValue, Condition condition){
+	public void updateUser(String fieldName, String newValue, Condition condition){
 		selectedTable.updateRecord(fieldName, newValue, condition);
 	}
 	
@@ -107,26 +118,9 @@ public class User{
 	
 	
 	
-
-	
-	interface UserDBAction{
-		
-		void addTable(String tableName, ArguSet... args);
-		void removeTable(String name);
-		Table useTable(String name);
-	}
-	
-	interface UserTableAction{
-		
-		
-		ArrayList<String> searchRecord(Condition condition);
-		void insertRecord(HashMap<String, String> insertMap);
-		void updateRecord(String fieldName, String newValue, Condition condition);
-		void deleteRecord(Condition condition);
-
-	}
 	
 }
+
 
 class ArguSet{
 	String name;
@@ -140,5 +134,22 @@ class Condition{
 	String fieldName;
 	String condition;
 	
-	
 }
+
+interface UserDBAction{
+	
+	void addTable(String tableName, PrintWriter out, ArguSet... args);
+	void removeTable(String name, PrintWriter out);
+	UserTableAction useTable(String name, PrintWriter out);
+}
+
+interface UserTableAction{
+	
+	
+	ArrayList<String> searchRecord(Condition condition);
+	void insertRecord(HashMap<String, String> insertMap);
+	void updateRecord(String fieldName, String newValue, Condition condition);
+	void deleteRecord(Condition condition);
+
+}
+

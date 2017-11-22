@@ -49,7 +49,7 @@ public class MyClientGUI extends JFrame{
 			public void actionPerformed(ActionEvent e) {
 				String username = txtUserName.getText();
 				String password = txtPW.getText();
-				if(myclient ==null){
+				if(myclient==null ||myclient.connectionSock.isClosed()){
 					
 					messages ="";
 					
@@ -89,6 +89,7 @@ public class MyClientGUI extends JFrame{
 	
 				}else{
 					messages += "you already connected to the server \n";
+					updateMessage();
 				}
 			}
 
@@ -102,7 +103,6 @@ public class MyClientGUI extends JFrame{
 					try{
 						
 						myclient.close();
-						myclient =null;
 						messages +="You have disconnected to Server \n";
 						updateMessage();
 					}catch(Exception ex){
