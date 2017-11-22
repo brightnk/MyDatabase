@@ -38,17 +38,26 @@ public class DBHelper {
 	
 	
 	public static void writeToDB(MyDB mydb){
-		
-		String mydbTxt =gson.toJson(mydb);
-		System.out.println(mydbTxt);
-		try {
-			MyDB.DBwritable=false;
-			BufferedWriter out = new BufferedWriter(new FileWriter(DBFILENAME));
-			out.write(mydbTxt);
-			out.close();
-			MyDB.DBwritable=true;
-		} catch (Exception e) {
-		  e.printStackTrace();
+		if(MyDB.DBwritable){
+			
+			String mydbTxt =gson.toJson(mydb);
+			System.out.println(mydbTxt);
+			try {
+				MyDB.DBwritable=false;
+				BufferedWriter out = new BufferedWriter(new FileWriter(DBFILENAME));
+				out.write(mydbTxt);
+				out.close();
+				MyDB.DBwritable=true;
+			} catch (Exception e) {
+			  e.printStackTrace();
+			}
+		}else{
+			try{
+				Thread.sleep(200);
+				writeToDB(mydb);
+			}catch(InterruptedException e){
+				e.printStackTrace();
+			}
 		}
 	}
 	

@@ -280,13 +280,22 @@ class Table implements UserTableAction{
 			try {
 				myJson = new JSONObject(record);
 				switch(condition.comparer){
+				
 					case ">": 
-						
 						if(dataCompare(condition.fieldName, myJson.getString(condition.fieldName),condition.condition)>0) afterSearch.add(record);
 						break;
 					case "<":if(dataCompare(condition.fieldName, myJson.getString(condition.fieldName),condition.condition)<0) afterSearch.add(record);
 						break;
 					case "=":if(dataCompare(condition.fieldName, myJson.getString(condition.fieldName),condition.condition)==0) afterSearch.add(record);
+						break;
+					case ">=":
+						if(dataCompare(condition.fieldName, myJson.getString(condition.fieldName),condition.condition)>=0) afterSearch.add(record);
+						break;
+					case "<=":
+						if(dataCompare(condition.fieldName, myJson.getString(condition.fieldName),condition.condition)<=0) afterSearch.add(record);
+						break;
+					case "!=":
+						if(dataCompare(condition.fieldName, myJson.getString(condition.fieldName),condition.condition)!=0) afterSearch.add(record);
 						break;
 				}
 				
@@ -355,6 +364,32 @@ class Table implements UserTableAction{
 						count++;
 					}
 						break;
+						
+					case ">=":
+						if(dataCompare(condition.fieldName, myJson.getString(condition.fieldName),condition.condition)>=0) {
+							myJson.put(fieldName,newValue);
+							record = myJson.toString();
+							count++;
+						}
+						break;
+					case "<=":
+						if(dataCompare(condition.fieldName, myJson.getString(condition.fieldName),condition.condition)<=0) {
+							myJson.put(fieldName,newValue);
+							record = myJson.toString();
+							count++;
+						}
+						break;
+					case "!=":
+						if(dataCompare(condition.fieldName, myJson.getString(condition.fieldName),condition.condition)!=0) {
+							myJson.put(fieldName,newValue);
+							record = myJson.toString();
+							count++;
+						}
+						break;
+						
+						
+						
+						
 				}
 				
 			} catch (JSONException e) {
@@ -386,6 +421,18 @@ class Table implements UserTableAction{
 						count++;
 						break;
 					case "=":if(dataCompare(fieldName, myJson.getString(fieldName),condition)==0) recordsTxt.remove(record);
+						count++;
+						break;
+					case ">=":
+						if(dataCompare(fieldName, myJson.getString(fieldName),condition)>=0) recordsTxt.remove(record);
+						count++;
+						break;
+					case "<=":
+						if(dataCompare(fieldName, myJson.getString(fieldName),condition)<=0) recordsTxt.remove(record);
+						count++;
+						break;
+					case "!=":
+						if(dataCompare(fieldName, myJson.getString(fieldName),condition)!=0) recordsTxt.remove(record);
 						count++;
 						break;
 				}

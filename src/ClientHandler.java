@@ -154,12 +154,12 @@ public class ClientHandler implements Runnable {
 			case "database":
 				currentUser.selectedDB = mydb.useDB(commands[2], out);
 				if(currentUser.selectedDB!=null) currentUser.selectedDBname = commands[2];
-					break;
+			break;
 					
 			case "table":
 				currentUser.selectedTable = currentUser.useTable(commands[2], out);
 			}
-			
+			break;
 			//select (field1),(field2),(field3) where (fieldname) (=><) (val);
 		case "select":
 			condition = new Condition();
@@ -211,6 +211,7 @@ public class ClientHandler implements Runnable {
 		
 		}catch(Exception e){
 			out.println(WELCOMEWORD+"your input is not valid, please double check");
+			e.printStackTrace();
 		}
 	}
 	
