@@ -70,7 +70,7 @@ public class User{
 		if(selectedDB !=null){
 			selectedDB.addTable(tableName, out,args );
 		}else{
-			out.println("please select db first");
+			out.println(ClientHandler.WELCOMEWORD+"please select db first");
 		}
 	}
 	
@@ -78,7 +78,7 @@ public class User{
 		if(selectedDB !=null){
 			selectedDB.removeTable(name, out);
 		}else{
-			out.println("please select db first");
+			out.println(ClientHandler.WELCOMEWORD+"please select db first");
 		}
 	}
 	
@@ -88,7 +88,7 @@ public class User{
 			if(selectedTable!=null) this.selectedTableName=name;
 			return selectedTable;
 		}
-		out.println("please select db first");
+		out.println(ClientHandler.WELCOMEWORD+"please select db first");
 		return null;
 	}
 	
@@ -97,18 +97,26 @@ public class User{
 	 * 
 	 */
 	
-	public void insertRecord(HashMap<String, String> insertMap){
-		selectedTable.insertRecord(insertMap);
+	public void insertRecord(HashMap<String, String> insertMap, PrintWriter out){
+		if(selectedTable!=null)
+		selectedTable.insertRecord(insertMap, out);
+		else out.println(ClientHandler.WELCOMEWORD+"please select table first");
+			
 	}
 	//search from all db records string, assume 1 condition only
 	public void searchRecord(Condition condition){
 		selectedTable.searchRecord(condition);
 	}
 	
-	public void updateUser(String fieldName, String newValue, Condition condition){
+	public void updateRecord(String fieldName, String newValue, Condition condition){
 		selectedTable.updateRecord(fieldName, newValue, condition);
 	}
 	
+	public void deleteRecord(String comparer,String fieldName,	String condition, PrintWriter out){
+		if(selectedTable!=null)
+			selectedTable.deleteRecord(comparer, fieldName, condition, out);
+			else out.println(ClientHandler.WELCOMEWORD+"please select table first");
+	}
 	
 
 	//to do method
@@ -134,6 +142,8 @@ class Condition{
 	String fieldName;
 	String condition;
 	
+	public Condition(){}
+	
 }
 
 interface UserDBAction{
@@ -147,9 +157,9 @@ interface UserTableAction{
 	
 	
 	ArrayList<String> searchRecord(Condition condition);
-	void insertRecord(HashMap<String, String> insertMap);
+	void insertRecord(HashMap<String, String> insertMap, PrintWriter out);
 	void updateRecord(String fieldName, String newValue, Condition condition);
-	void deleteRecord(Condition condition);
+	void deleteRecord(String comparer,String fieldName,	String condition, PrintWriter out);
 
 }
 

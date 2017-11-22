@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.HashMap;
 
 public class ClientHandler implements Runnable {
 	public final static String WELCOMEWORD = "JDB-->";
@@ -137,7 +138,11 @@ public class ClientHandler implements Runnable {
 						currentUser.selectedTableName=null;
 					}
 					currentUser.removeTable(commands[2],out);
-					
+					break;
+				//delete record - command: delete record where (fieldName) (=,>,<) (value);
+				case "record":
+							currentUser.deleteRecord(commands[4],commands[3],commands[5], out);
+					break;
 				}
 			break;
 			
@@ -155,7 +160,16 @@ public class ClientHandler implements Runnable {
 			}
 		case "select":
 			break;
+			//insert record - command: insert field1,field2,field3 value val1,val2,va3;
 		case "insert":
+			String []subfield = commands[1].split(",");
+			String []subVal = commands[3].split(",");
+			HashMap<String, String> insertMap = new HashMap<String,String>();
+			for(int i=0; i<subfield.length;i++){
+				insertMap.put(subfield[i], subVal[i]);				
+			}
+			currentUser.insertRecord(insertMap, out);
+			
 			break;
 			
 		case "update":
@@ -167,10 +181,7 @@ public class ClientHandler implements Runnable {
 					break;
 				}
 			break;
-		
-		
-		
-		
+
 		}
 		
 		DBHelper.writeToDB(mydb);

@@ -215,21 +215,23 @@ class Table implements UserTableAction{
 	};
 	
 	@Override
-	public void insertRecord(HashMap<String, String> insertMap) {
+	public void insertRecord(HashMap<String, String> insertMap, PrintWriter out) {
 		 this.recordID++;
 		 String fieldname;
-		 String insertString = "{id:"+recordID;
+		 String insertString = "{\"id\": \""+recordID+"\"";
 		 try{
 			for(Map.Entry<String, DataType> entry: recordMeta.entrySet()){
 				fieldname = entry.getKey();
 				String insertValue = insertMap.get(fieldname);
+				//if(insertValue==null) continue;
 				String metaType = entry.getValue().type;
 				int metaLength = entry.getValue().length;
 				typeCheck(metaType, insertValue);
 				if(insertValue.length()>metaLength) throw new Exception();
 				else{
 					
-					insertString += ", "+fieldname+": "+insertValue;
+					insertString += ", \""+fieldname+"\": \""+insertValue+"\"";
+					out.print(ClientHandler.WELCOMEWORD+ " 1 recorded added!");
 					
 				}
 			}
@@ -237,7 +239,7 @@ class Table implements UserTableAction{
 			recordsTxt.add(insertString);
 		 }catch(Exception e){
 			 this.recordID--;
-			 System.out.println(e.getMessage());
+			 out.println(ClientHandler.WELCOMEWORD+"your input is invalid, please double check to match table structure");
 		 }
 
 	}
@@ -320,17 +322,21 @@ class Table implements UserTableAction{
 
 
 	@Override
-	public void deleteRecord(Condition condition) {
+	public void deleteRecord(String comparer,String fieldName,	String condition, PrintWriter out) {
 		JSONObject myJson;
+		int count=0;
 		for(String record: recordsTxt){
 			try {
 				myJson = new JSONObject(record);
-				switch(condition.comparer){
-					case ">": if(myJson.getString(condition.fieldName).compareTo(condition.condition)>0) recordsTxt.remove(record);
+				switch(comparer){
+					case ">": if(myJson.getString(fieldName).compareTo(condition)>0) recordsTxt.remove(record);
+						count++;
 						break;
-					case "<":if(myJson.getString(condition.fieldName).compareTo(condition.condition)<0) recordsTxt.remove(record);
+					case "<":if(myJson.getString(fieldName).compareTo(condition)<0) recordsTxt.remove(record);
+						count++;
 						break;
-					case "=":if(myJson.getString(condition.fieldName).compareTo(condition.condition)==0) recordsTxt.remove(record);
+					case "=":if(myJson.getString(fieldName).compareTo(condition)==0) recordsTxt.remove(record);
+						count++;
 						break;
 				}
 				
@@ -338,9 +344,9 @@ class Table implements UserTableAction{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
 		}
-		
+		if(count>0) out.println(ClientHandler.WELCOMEWORD+"Totally "+ count+" records are deleted");
+		else out.println(ClientHandler.WELCOMEWORD+ "0 record is founded");
 	}
 	
 	
