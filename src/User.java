@@ -104,12 +104,13 @@ public class User{
 			
 	}
 	//search from all db records string, assume 1 condition only
-	public void searchRecord(Condition condition){
-		selectedTable.searchRecord(condition);
+	public ArrayList<String> searchRecord(Condition condition, PrintWriter out){
+		return selectedTable.searchRecord(condition, out);
 	}
 	
-	public void updateRecord(String fieldName, String newValue, Condition condition){
-		selectedTable.updateRecord(fieldName, newValue, condition);
+	
+	public void updateRecord(String fieldName, String newValue, Condition condition, PrintWriter out){
+		selectedTable.updateRecord(fieldName, newValue, condition, out);
 	}
 	
 	public void deleteRecord(String comparer,String fieldName,	String condition, PrintWriter out){
@@ -120,8 +121,8 @@ public class User{
 	
 
 	//to do method
-	public void displayRecord(ArrayList<String> records, String...fieldNames) {
-
+	public void displayRecord(ArrayList<String> records, PrintWriter out, String...fieldNames) {
+			selectedTable.displayRecord(records, out, fieldNames);
 	}
 	
 	
@@ -156,9 +157,10 @@ interface UserDBAction{
 interface UserTableAction{
 	
 	
-	ArrayList<String> searchRecord(Condition condition);
+	ArrayList<String> searchRecord(Condition condition, PrintWriter out);
 	void insertRecord(HashMap<String, String> insertMap, PrintWriter out);
-	void updateRecord(String fieldName, String newValue, Condition condition);
+	void updateRecord(String fieldName, String newValue, Condition condition, PrintWriter out);
+	void displayRecord(ArrayList<String> records, PrintWriter out,String...fieldName);
 	void deleteRecord(String comparer,String fieldName,	String condition, PrintWriter out);
 
 }

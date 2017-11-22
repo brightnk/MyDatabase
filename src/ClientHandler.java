@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ClientHandler implements Runnable {
@@ -88,7 +89,7 @@ public class ClientHandler implements Runnable {
 	public void inputmsgHandler(String msg){
 		
 		String[] commands = msg.split(" ");
-		
+		Condition condition;
 		try{
 		switch(commands[0].toLowerCase()){		
 		case "create":
@@ -158,8 +159,18 @@ public class ClientHandler implements Runnable {
 			case "table":
 				currentUser.selectedTable = currentUser.useTable(commands[2], out);
 			}
+			
+			//select (field1),(field2),(field3) where (fieldname) (=><) (val);
 		case "select":
+			condition = new Condition();
+			condition.fieldName = commands[3];
+			condition.comparer = commands[4];
+			condition.condition = commands[5];
+			currentUser.displayRecord(currentUser.searchRecord(condition, out), out, commands[1].split(","));
+			
+			
 			break;
+			
 			//insert record - command: insert field1,field2,field3 value val1,val2,va3;
 		case "insert":
 			String []subfield = commands[1].split(",");
@@ -179,6 +190,18 @@ public class ClientHandler implements Runnable {
 					boolean isadmin = Boolean.parseBoolean(commands[6]); 
 					mydb.updateUser(this.currentUser, commands[2], new User(commands[4],commands[5],isadmin), out);
 					break;
+				//update record - command: update record (fieldname) with (newVal) where (fieldname) (=><) (val);
+				case "record":
+					String fieldname = commands[2];
+					String newVal = commands[4];
+					condition = new Condition();
+					condition.fieldName = commands[6];
+					condition.comparer = commands[7];
+					condition.condition = commands[8];
+					currentUser.updateRecord(fieldname, newVal, condition, out);
+					
+					
+					
 				}
 			break;
 

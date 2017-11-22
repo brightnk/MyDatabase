@@ -231,7 +231,7 @@ class Table implements UserTableAction{
 				else{
 					
 					insertString += ", \""+fieldname+"\": \""+insertValue+"\"";
-					out.print(ClientHandler.WELCOMEWORD+ " 1 recorded added!");
+					out.println(ClientHandler.WELCOMEWORD+ " 1 recorded added!");
 					
 				}
 			}
@@ -253,22 +253,40 @@ class Table implements UserTableAction{
 				break;
 		}
 	}
-
-
+	
+	//compare data with their true datatype
+	public int dataCompare(String fieldName, String compare1, String compare2){
+		DataType dataType =  recordMeta.get(fieldName);
+		switch(dataType.type){
+		
+		case "STRING": return compare1.compareTo(compare2);
+			
+		case "INT": return Integer.parseInt(compare1) - Integer.parseInt(compare2);
+		case "DOUBLE": if(Double.parseDouble(compare1) - Double.parseDouble(compare2)>0) return 1;
+						else if(Double.parseDouble(compare1) - Double.parseDouble(compare2)<0) return -1;
+						else return 0;
+		
+		default: return 0;
+		
+		}
+		
+	}
 	
 	@Override
-	public ArrayList<String> searchRecord(Condition condition) {
+	public ArrayList<String> searchRecord(Condition condition, PrintWriter out) {
 		ArrayList<String> afterSearch =new ArrayList<String>();
 		JSONObject myJson;
 		for(String record: recordsTxt){
 			try {
 				myJson = new JSONObject(record);
 				switch(condition.comparer){
-					case ">": if(myJson.getString(condition.fieldName).compareTo(condition.condition)>0) afterSearch.add(record);
+					case ">": 
+						
+						if(dataCompare(condition.fieldName, myJson.getString(condition.fieldName),condition.condition)>0) afterSearch.add(record);
 						break;
-					case "<":if(myJson.getString(condition.fieldName).compareTo(condition.condition)<0) afterSearch.add(record);
+					case "<":if(dataCompare(condition.fieldName, myJson.getString(condition.fieldName),condition.condition)<0) afterSearch.add(record);
 						break;
-					case "=":if(myJson.getString(condition.fieldName).compareTo(condition.condition)==0) afterSearch.add(record);
+					case "=":if(dataCompare(condition.fieldName, myJson.getString(condition.fieldName),condition.condition)==0) afterSearch.add(record);
 						break;
 				}
 				
@@ -278,34 +296,63 @@ class Table implements UserTableAction{
 			}
 			
 		}
-		
+		if(afterSearch.size()>0){
+			out.println(ClientHandler.WELCOMEWORD+afterSearch.size()+"records are founded");
+		}else out.println(afterSearch.size()+ "no record founded");
 		return afterSearch;
 		
 	}
 
-
+	@Override
+	public void displayRecord(ArrayList<String> records, PrintWriter out,String...fieldNames){
+		JSONObject myJson;
+		String displayString;		
+		for(String record: records){
+			try{
+				myJson = new JSONObject(record);
+				displayString ="{";
+				for(String fieldName:fieldNames){
+					displayString += "\""+fieldName+"\": \""+myJson.getString(fieldName)+"\",";
+				}
+				displayString = displayString.substring(0, displayString.length()-1)+"}";
+				out.println(displayString);
+				
+			}catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		
+		
+		
+	}
 
 
 	@Override
-	public void updateRecord(String fieldName, String newValue, Condition condition) {
+	public void updateRecord(String fieldName, String newValue, Condition condition, PrintWriter out) {
 		JSONObject myJson;
+		int count = 0;
 		for(String record: recordsTxt){
 			try {
 				myJson = new JSONObject(record);
 				switch(condition.comparer){
-					case ">": if(myJson.getString(condition.fieldName).compareTo(condition.condition)>0){
+					case ">": if(dataCompare(condition.fieldName, myJson.getString(condition.fieldName),condition.condition)>0){
 						myJson.put(fieldName,newValue);
 						record = myJson.toString();
+						count++;
 					}
 						break;
-					case "<":if(myJson.getString(condition.fieldName).compareTo(condition.condition)<0) {
+					case "<":if(dataCompare(condition.fieldName, myJson.getString(condition.fieldName),condition.condition)<0) {
 						myJson.put(fieldName,newValue);
 						record = myJson.toString();
+						count++;
 					}
 						break;
-					case "=":if(myJson.getString(condition.fieldName).compareTo(condition.condition)==0) {
+					case "=":if(dataCompare(condition.fieldName, myJson.getString(condition.fieldName),condition.condition)==0) {
 						myJson.put(fieldName,newValue);
 						record = myJson.toString();
+						count++;
 					}
 						break;
 				}
@@ -316,6 +363,9 @@ class Table implements UserTableAction{
 			}
 			
 		}
+		if(count>0) out.println(ClientHandler.WELCOMEWORD+count +" record(s) are updated");
+		else out.println(ClientHandler.WELCOMEWORD+"no record founded");
+		
 		
 	}
 
@@ -329,13 +379,13 @@ class Table implements UserTableAction{
 			try {
 				myJson = new JSONObject(record);
 				switch(comparer){
-					case ">": if(myJson.getString(fieldName).compareTo(condition)>0) recordsTxt.remove(record);
+					case ">": if(dataCompare(fieldName, myJson.getString(fieldName),condition)>0) recordsTxt.remove(record);
 						count++;
 						break;
-					case "<":if(myJson.getString(fieldName).compareTo(condition)<0) recordsTxt.remove(record);
+					case "<":if(dataCompare(fieldName, myJson.getString(fieldName),condition)<0) recordsTxt.remove(record);
 						count++;
 						break;
-					case "=":if(myJson.getString(fieldName).compareTo(condition)==0) recordsTxt.remove(record);
+					case "=":if(dataCompare(fieldName, myJson.getString(fieldName),condition)==0) recordsTxt.remove(record);
 						count++;
 						break;
 				}

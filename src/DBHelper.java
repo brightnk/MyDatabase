@@ -38,6 +38,7 @@ public class DBHelper {
 	
 	
 	public static void writeToDB(MyDB mydb){
+		
 		String mydbTxt =gson.toJson(mydb);
 		System.out.println(mydbTxt);
 		try {
