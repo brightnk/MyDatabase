@@ -19,7 +19,10 @@ public class MyDB{
 	//for user login check, return null if no record find
 	public User login(String name, String password){
 		for(User user: users){
-			if(user.name.equals(name) &&user.password.equals(password)) return user;
+			if(user.name.equals(name) &&user.password.equals(password)&&user.canLogin){
+				user.canLogin =false;
+				return user;
+			}
 		}
 		return null;
 	}

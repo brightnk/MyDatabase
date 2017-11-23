@@ -14,12 +14,14 @@ public class User{
 	String selectedTableName;
 	UserDBAction selectedDB;
 	UserTableAction selectedTable;
+	boolean canLogin = true;
 	
 	public User(String name, String password, boolean isAdmin){
 
 		this.name = name;
 		this.password =password;
 		this.isAdmin = isAdmin;
+		this.canLogin = true;
 
 	};
 	

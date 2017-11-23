@@ -69,6 +69,10 @@ public class ClientHandler implements Runnable {
             System.out.println("Error client# " + id + ": " + e);
         } finally {
             try {
+            	if(currentUser!=null) {
+            		currentUser.canLogin=true;
+            		DBHelper.writeToDB(mydb);
+            	}
             	
                 socket.close();
             } catch (IOException e) {
