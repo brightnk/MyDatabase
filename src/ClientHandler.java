@@ -32,22 +32,7 @@ public class ClientHandler implements Runnable {
            String username=in.readLine();
            String password=in.readLine();
            System.out.println(username+" "+password);
-           MyJson tempJson = new MyJson("{\""+ condition.fieldName +"\": \""+ condition.condition+"\"}");
-   		MyJson.typeCmp = recordMeta.get(condition.fieldName).type;
-   		MyJson.fieldNameCmp = condition.fieldName;MyJson tempJson = new MyJson("{\""+ condition.fieldName +"\": \""+ condition.condition+"\"}");
-		MyJson.typeCmp = recordMeta.get(condition.fieldName).type;
-		MyJson.fieldNameCmp = condition.fieldName;MyJson tempJson = new MyJson("{\""+ condition.fieldName +"\": \""+ condition.condition+"\"}");
-		MyJson.typeCmp = recordMeta.get(condition.fieldName).type;
-		MyJson.fieldNameCmp = condition.fieldName;MyJson tempJson = new MyJson("{\""+ condition.fieldName +"\": \""+ condition.condition+"\"}");
-		MyJson.typeCmp = recordMeta.get(condition.fieldName).type;
-		MyJson.fieldNameCmp = condition.fieldName;MyJson tempJson = new MyJson("{\""+ condition.fieldName +"\": \""+ condition.condition+"\"}");
-		MyJson.typeCmp = recordMeta.get(condition.fieldName).type;
-		MyJson.fieldNameCmp = condition.fieldName;MyJson tempJson = new MyJson("{\""+ condition.fieldName +"\": \""+ condition.condition+"\"}");
-		MyJson.typeCmp = recordMeta.get(condition.fieldName).type;
-		MyJson.fieldNameCmp = condition.fieldName;MyJson tempJson = new MyJson("{\""+ condition.fieldName +"\": \""+ condition.condition+"\"}");
-		MyJson.typeCmp = recordMeta.get(condition.fieldName).type;
-		MyJson.fieldNameCmp = condition.fieldName;nt = 0;nt = 0;nt = 0;nt = 0;nt = 0;sdfadfasfcccvvvsdfadfasfcccvvvsdfadfasfcccvvv           this.currentUser = mydb.login(username, password);
-           
+           this.currentUser = mydb.login(username, password);
            
            if(currentUser==null) {
         	   out.println(WELCOMEWORD+"log in failed, please check your input");

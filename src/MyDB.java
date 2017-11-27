@@ -303,7 +303,7 @@ class Table implements UserTableAction{
 			case "!=":
 				if(record.compareTo(tempJson)!=0) afterSearch.add(record.data);
 				break;
-		}
+			}
 		}
 		
 		
@@ -396,8 +396,43 @@ class Table implements UserTableAction{
 
 	@Override
 	public void updateRecord(String fieldName, String newValue, Condition condition, PrintWriter out) {
-		JSONObject myJson;
+		
+		MyJson tempJson = new MyJson("{\""+ fieldName +"\": \""+ condition+"\"}");
+		MyJson.typeCmp = recordMeta.get(fieldName).type;
+		MyJson.fieldNameCmp = fieldName;
 		int count = 0;
+		JSONObject myJson;
+		for(MyJson record: myjsons){
+			switch(condition.comparer){			
+			case ">": 
+				if(record.compareTo(tempJson)>0) {
+					record.updateRecord(fieldName, newValue);
+					count ++;
+				}
+				break;
+			case "<":if(record.compareTo(tempJson)<0) record.updateRecord(fieldName, newValue);
+				count ++;
+				break;
+			case "=":if(record.compareTo(tempJson)==0) record.updateRecord(fieldName, newValue);
+				count ++;
+				break;
+			case ">=":
+				if(record.compareTo(tempJson)>=0) record.updateRecord(fieldName, newValue);
+				count ++;
+				break;
+			case "<=":
+				if(record.compareTo(tempJson)<=0) record.updateRecord(fieldName, newValue);
+				count ++;
+				break;
+			case "!=":
+				if(record.compareTo(tempJson)!=0) record.updateRecord(fieldName, newValue);
+				count ++;
+				break;
+			}
+		}
+		
+		
+		/*
 		for(String record: recordsTxt){
 			try {
 				myJson = new JSONObject(record);
@@ -454,6 +489,7 @@ class Table implements UserTableAction{
 			}
 			
 		}
+		*/
 		if(count>0) out.println(ClientHandler.WELCOMEWORD+count +" record(s) are updated");
 		else out.println(ClientHandler.WELCOMEWORD+"no record founded");
 		
@@ -464,8 +500,36 @@ class Table implements UserTableAction{
 
 	@Override
 	public void deleteRecord(String comparer,String fieldName,	String condition, PrintWriter out) {
-		JSONObject myJson;
+		
+		MyJson tempJson = new MyJson("{\""+ fieldName +"\": \""+ condition+"\"}");
+		MyJson.typeCmp = recordMeta.get(fieldName).type;
+		MyJson.fieldNameCmp = fieldName;
 		int count=0;
+		for(MyJson record: myjsons){
+			switch(comparer){			
+			case ">": 
+				if(record.compareTo(tempJson)>0) myjsons.remove(record);
+				count++;
+				break;
+			case "<":if(record.compareTo(tempJson)<0) myjsons.remove(record);
+				count++;
+				break;
+			case "=":if(record.compareTo(tempJson)==0) myjsons.remove(record);count++;
+				break;
+			case ">=":
+				if(record.compareTo(tempJson)>=0) myjsons.remove(record);count++;
+				break;
+			case "<=":
+				if(record.compareTo(tempJson)<=0) myjsons.remove(record);count++;
+				break;
+			case "!=":
+				if(record.compareTo(tempJson)!=0) myjsons.remove(record);count++;
+				break;
+			}
+		}
+		
+		/*
+		JSONObject myJson;
 		for(String record: recordsTxt){
 			try {
 				myJson = new JSONObject(record);
@@ -498,6 +562,7 @@ class Table implements UserTableAction{
 				e.printStackTrace();
 			}
 		}
+		*/
 		if(count>0) out.println(ClientHandler.WELCOMEWORD+"Totally "+ count+" records are deleted");
 		else out.println(ClientHandler.WELCOMEWORD+ "0 record is founded");
 	}
