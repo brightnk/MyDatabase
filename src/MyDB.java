@@ -99,6 +99,7 @@ public class MyDB{
 				}
 			}
 			dbs.add(new Db(name));
+			out.println(ClientHandler.WELCOMEWORD+"database created successfully");
 		}else out.println(ClientHandler.WELCOMEWORD+"you are not admin");
 		
 	}
@@ -207,6 +208,7 @@ class Table implements UserTableAction{
 	String tableName;
 	Map<String, DataType> recordMeta = new LinkedHashMap<String, DataType>();
 	ArrayList<String> recordsTxt = new ArrayList<String>();
+	ArrayList<MyJson> myjsons = new ArrayList<MyJson>();
 	
 	public Table(String name, ArguSet...arguSets){
 		LASTID++;
@@ -240,6 +242,8 @@ class Table implements UserTableAction{
 			}
 			insertString +="}";
 			recordsTxt.add(insertString);
+			MyJson newJson = new MyJson(insertString);
+			myjsons.add(newJson);
 		 }catch(Exception e){
 			 this.recordID--;
 			 out.println(ClientHandler.WELCOMEWORD+"your input is invalid, please double check to match table structure");
@@ -269,7 +273,7 @@ class Table implements UserTableAction{
 						else if(Double.parseDouble(compare1) - Double.parseDouble(compare2)<0) return -1;
 						else return 0;
 		
-		default: return 0;
+		default: return 0;	
 		
 		}
 		
@@ -278,6 +282,32 @@ class Table implements UserTableAction{
 	@Override
 	public ArrayList<String> searchRecord(Condition condition, PrintWriter out) {
 		ArrayList<String> afterSearch =new ArrayList<String>();
+		MyJson tempJson = new MyJson("{\""+ condition.fieldName +"\": \""+ condition.condition+"\"}");
+		MyJson.typeCmp = recordMeta.get(condition.fieldName).type;
+		MyJson.fieldNameCmp = condition.fieldName;
+		for(MyJson record: myjsons){
+			switch(condition.comparer){			
+			case ">": 
+				if(record.compareTo(tempJson)>0) afterSearch.add(record.data);
+				break;
+			case "<":if(record.compareTo(tempJson)<0) afterSearch.add(record.data);
+				break;
+			case "=":if(record.compareTo(tempJson)==0) afterSearch.add(record.data);
+				break;
+			case ">=":
+				if(record.compareTo(tempJson)>=0) afterSearch.add(record.data);
+				break;
+			case "<=":
+				if(record.compareTo(tempJson)<=0) afterSearch.add(record.data);
+				break;
+			case "!=":
+				if(record.compareTo(tempJson)!=0) afterSearch.add(record.data);
+				break;
+		}
+		}
+		
+		
+		/*
 		JSONObject myJson;
 		for(String record: recordsTxt){
 			try {
@@ -302,12 +332,13 @@ class Table implements UserTableAction{
 						break;
 				}
 				
-			} catch (JSONException e) {
+			}
+			catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
-		}
+		}*/ 
 		if(afterSearch.size()>0){
 			out.println(ClientHandler.WELCOMEWORD+afterSearch.size()+"records are founded");
 		}else out.println(afterSearch.size()+ "no record founded");
@@ -318,26 +349,48 @@ class Table implements UserTableAction{
 	@Override
 	public void displayRecord(ArrayList<String> records, PrintWriter out,String...fieldNames){
 		JSONObject myJson;
-		String displayString;		
-		for(String record: records){
-			try{
-				myJson = new JSONObject(record);
-				displayString ="{";
-				for(String fieldName:fieldNames){
-					displayString += "\""+fieldName+"\": \""+myJson.getString(fieldName)+"\",";
+		String displayString;
+		if(fieldNames[0].equals("*")){
+			ArrayList<String> allfields = new ArrayList<String>();
+			allfields.add("id");
+			for(Map.Entry<String, DataType> entry: recordMeta.entrySet()){
+				allfields.add(entry.getKey());
+			}
+			
+			for(String record: records){
+				try{
+					myJson = new JSONObject(record);
+					displayString ="{";
+					for(String fieldName:allfields){
+						displayString += "\""+fieldName+"\": \""+myJson.getString(fieldName)+"\",";
+					}
+					displayString = displayString.substring(0, displayString.length()-1)+"}";
+					out.println(displayString);
+					
+				}catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
-				displayString = displayString.substring(0, displayString.length()-1)+"}";
-				out.println(displayString);
-				
-			}catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			}
+			
+		}else{
+			for(String record: records){
+				try{
+					myJson = new JSONObject(record);
+					displayString ="{";
+					for(String fieldName:fieldNames){
+						displayString += "\""+fieldName+"\": \""+myJson.getString(fieldName)+"\",";
+					}
+					displayString = displayString.substring(0, displayString.length()-1)+"}";
+					out.println(displayString);
+					
+				}catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
-		
-		
-		
-		
+
 	}
 
 

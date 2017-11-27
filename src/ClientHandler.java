@@ -32,7 +32,21 @@ public class ClientHandler implements Runnable {
            String username=in.readLine();
            String password=in.readLine();
            System.out.println(username+" "+password);
-           this.currentUser = mydb.login(username, password);
+           MyJson tempJson = new MyJson("{\""+ condition.fieldName +"\": \""+ condition.condition+"\"}");
+   		MyJson.typeCmp = recordMeta.get(condition.fieldName).type;
+   		MyJson.fieldNameCmp = condition.fieldName;MyJson tempJson = new MyJson("{\""+ condition.fieldName +"\": \""+ condition.condition+"\"}");
+		MyJson.typeCmp = recordMeta.get(condition.fieldName).type;
+		MyJson.fieldNameCmp = condition.fieldName;MyJson tempJson = new MyJson("{\""+ condition.fieldName +"\": \""+ condition.condition+"\"}");
+		MyJson.typeCmp = recordMeta.get(condition.fieldName).type;
+		MyJson.fieldNameCmp = condition.fieldName;MyJson tempJson = new MyJson("{\""+ condition.fieldName +"\": \""+ condition.condition+"\"}");
+		MyJson.typeCmp = recordMeta.get(condition.fieldName).type;
+		MyJson.fieldNameCmp = condition.fieldName;MyJson tempJson = new MyJson("{\""+ condition.fieldName +"\": \""+ condition.condition+"\"}");
+		MyJson.typeCmp = recordMeta.get(condition.fieldName).type;
+		MyJson.fieldNameCmp = condition.fieldName;MyJson tempJson = new MyJson("{\""+ condition.fieldName +"\": \""+ condition.condition+"\"}");
+		MyJson.typeCmp = recordMeta.get(condition.fieldName).type;
+		MyJson.fieldNameCmp = condition.fieldName;MyJson tempJson = new MyJson("{\""+ condition.fieldName +"\": \""+ condition.condition+"\"}");
+		MyJson.typeCmp = recordMeta.get(condition.fieldName).type;
+		MyJson.fieldNameCmp = condition.fieldName;nt = 0;nt = 0;nt = 0;nt = 0;nt = 0;sdfadfasfcccvvvsdfadfasfcccvvvsdfadfasfcccvvv           this.currentUser = mydb.login(username, password);
            
            
            if(currentUser==null) {
@@ -194,7 +208,7 @@ public class ClientHandler implements Runnable {
 					boolean isadmin = Boolean.parseBoolean(commands[6]); 
 					mydb.updateUser(this.currentUser, commands[2], new User(commands[4],commands[5],isadmin), out);
 					break;
-				//update record - command: update record (fieldname) with (newVal) where (fieldname) (=><) (val);
+				//update record - command: update record (fieldname) with (newVal) where (fieldname2) (=><) (val);
 				case "record":
 					String fieldname = commands[2];
 					String newVal = commands[4];
