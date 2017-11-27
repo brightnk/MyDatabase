@@ -10,17 +10,17 @@ public class MyJson implements Comparable<MyJson>{
 	}
 	
 	
-	public void updateRecord(String fieldName, String newValue){
+	public String updateRecord(String fieldName, String newValue){
 		try{
 			JSONObject myJson = new JSONObject(data);
 			myJson.put(fieldName, newValue);
-			this.data = myJson.toString();
+			return myJson.toString();
 			
 			
 		}catch(Exception e){
 			
 			e.printStackTrace();
-			
+			return null;
 		}
 		
 		

@@ -397,35 +397,35 @@ class Table implements UserTableAction{
 	@Override
 	public void updateRecord(String fieldName, String newValue, Condition condition, PrintWriter out) {
 		
-		MyJson tempJson = new MyJson("{\""+ fieldName +"\": \""+ condition+"\"}");
-		MyJson.typeCmp = recordMeta.get(fieldName).type;
-		MyJson.fieldNameCmp = fieldName;
+		MyJson tempJson = new MyJson("{\""+ condition.fieldName +"\": \""+ condition.condition+"\"}");
+		MyJson.typeCmp = recordMeta.get(condition.fieldName).type;
+		MyJson.fieldNameCmp = condition.fieldName;
 		int count = 0;
 		JSONObject myJson;
 		for(MyJson record: myjsons){
 			switch(condition.comparer){			
 			case ">": 
 				if(record.compareTo(tempJson)>0) {
-					record.updateRecord(fieldName, newValue);
+					record.data = record.updateRecord(fieldName, newValue);
 					count ++;
 				}
 				break;
-			case "<":if(record.compareTo(tempJson)<0) record.updateRecord(fieldName, newValue);
+			case "<":if(record.compareTo(tempJson)<0) record.data = record.updateRecord(fieldName, newValue);
 				count ++;
 				break;
-			case "=":if(record.compareTo(tempJson)==0) record.updateRecord(fieldName, newValue);
+			case "=":if(record.compareTo(tempJson)==0) record.data = record.updateRecord(fieldName, newValue);
 				count ++;
 				break;
 			case ">=":
-				if(record.compareTo(tempJson)>=0) record.updateRecord(fieldName, newValue);
+				if(record.compareTo(tempJson)>=0) record.data = record.updateRecord(fieldName, newValue);
 				count ++;
 				break;
 			case "<=":
-				if(record.compareTo(tempJson)<=0) record.updateRecord(fieldName, newValue);
+				if(record.compareTo(tempJson)<=0) record.data = record.updateRecord(fieldName, newValue);
 				count ++;
 				break;
 			case "!=":
-				if(record.compareTo(tempJson)!=0) record.updateRecord(fieldName, newValue);
+				if(record.compareTo(tempJson)!=0) record.data = record.updateRecord(fieldName, newValue);
 				count ++;
 				break;
 			}
@@ -514,18 +514,23 @@ class Table implements UserTableAction{
 			case "<":if(record.compareTo(tempJson)<0) myjsons.remove(record);
 				count++;
 				break;
-			case "=":if(record.compareTo(tempJson)==0) myjsons.remove(record);count++;
+			case "=":if(record.compareTo(tempJson)==0) myjsons.remove(record);
+			count++;
 				break;
 			case ">=":
-				if(record.compareTo(tempJson)>=0) myjsons.remove(record);count++;
+				if(record.compareTo(tempJson)>=0) myjsons.remove(record);
+				count++;
 				break;
 			case "<=":
-				if(record.compareTo(tempJson)<=0) myjsons.remove(record);count++;
+				if(record.compareTo(tempJson)<=0) myjsons.remove(record);
+				count++;
 				break;
 			case "!=":
-				if(record.compareTo(tempJson)!=0) myjsons.remove(record);count++;
+				if(record.compareTo(tempJson)!=0) myjsons.remove(record);
+				count++;
 				break;
 			}
+			if(myjsons.size()<1) break;
 		}
 		
 		/*
