@@ -8,23 +8,35 @@ import org.json.*;
 public class MyDB{
 	static boolean DBwritable = true;
 	ArrayList<User> users =new ArrayList<User>();
+	MyBinaryTree<User> usersTree =  new MyBinaryTree<User>();
+	MyBinaryTree<Db> dbsTree =  new MyBinaryTree<Db>();
 	ArrayList<Db> dbs = new ArrayList<Db>();	
 	public MyDB(){
 		
 		User defaultUser = new User("admin", "admin", true);
 		users.add(defaultUser);
+		usersTree.add(defaultUser);
 	}
 	
 	
 	//for user login check, return null if no record find
 	public User login(String name, String password){
-		for(User user: users){
+		
+		User temp = new User(name,password,false);
+		User result = usersTree.search(temp);
+		if(result==null) return null;
+		if(result.password.equals(password)) return result;
+		else return null;
+
+		/*
+		 * method before adding binary tree
+		 * for(User user: users){
 			if(user.name.equals(name) &&user.password.equals(password)&&user.canLogin){
 				user.canLogin =false;
 				return user;
 			}
 		}
-		return null;
+		return null;*/
 	}
 	
 	
@@ -32,15 +44,12 @@ public class MyDB{
 	public void addUser(User currentUser, User user, PrintWriter out){
 		if(currentUser.isAdmin){
 			boolean isExsit =false;
-			for(User myUser:users){
-				if(myUser.name.equals(user.name)){
-					isExsit =true;
-					break;
-				}
+			if(usersTree.search(user)!=null){
+				isExsit =true;
 			}
 			
 			if(!isExsit){
-				users.add(user);
+				usersTree.add(user);
 				out.println(ClientHandler.WELCOMEWORD+"added 1 new user successfully");
 			}else out.println(ClientHandler.WELCOMEWORD+"user already exist");
 		}else out.println(ClientHandler.WELCOMEWORD+"You are not admin");
@@ -51,15 +60,7 @@ public class MyDB{
 	public void deleteUser(User currentUser, String username, PrintWriter out) {
 		
 		if(currentUser.isAdmin){
-			for(User myUser: users){
-				if(myUser.name.equals(username)){
-					users.remove(myUser);
-					out.println(ClientHandler.WELCOMEWORD+"delete user successfully");
-					System.out.println(ClientHandler.WELCOMEWORD+"delete user successfully");
-					return;
-				}
-			}
-			out.println(ClientHandler.WELCOMEWORD+"no user found");
+			usersTree.remove(new User(username,"",false), out);
 		}else out.println(ClientHandler.WELCOMEWORD+"You are not admin");
 		
 		
@@ -71,16 +72,9 @@ public class MyDB{
 	public void updateUser(User currentUser, String olduserName, User updatedUser, PrintWriter out) {
 		
 		if(currentUser.isAdmin){
-			for(User myUser: users){
-				if(myUser.name.equals(olduserName)){
-					users.set(users.indexOf(myUser), updatedUser);
-					System.out.println(ClientHandler.WELCOMEWORD+"update user successfully");
-					out.println(ClientHandler.WELCOMEWORD+"update user successfully");
-					return;
-				}
-			}
 			
-			out.println(ClientHandler.WELCOMEWORD+"no user found");
+			usersTree.update(new User(olduserName,"",false),updatedUser,out);
+			
 		}else out.println(ClientHandler.WELCOMEWORD+"You are not admin");
 		
 		
@@ -146,7 +140,7 @@ public class MyDB{
 
 
 //Database class
-class Db implements UserDBAction{
+class Db implements UserDBAction, Comparable<Db>{
 	static int LASTID =0;
 	int dbId;
 	String dbName;
@@ -195,19 +189,25 @@ class Db implements UserDBAction{
 		}
 		out.println(ClientHandler.WELCOMEWORD+"The table name is not exsiting");
 		return null;
+	}
+
+	@Override
+	public int compareTo(Db o) {
+		
+		return this.dbName.compareTo(o.dbName);
 	};
 	
 	
 	
 }
 
-class Table implements UserTableAction{
+class Table implements UserTableAction, Comparable<Table>{
 	static int LASTID =0;
 	int recordID=0;
 	int tableId;
 	String tableName;
 	Map<String, DataType> recordMeta = new LinkedHashMap<String, DataType>();
-	ArrayList<String> recordsTxt = new ArrayList<String>();
+	//ArrayList<String> recordsTxt = new ArrayList<String>();
 	ArrayList<MyJson> myjsons = new ArrayList<MyJson>();
 	
 	public Table(String name, ArguSet...arguSets){
@@ -236,14 +236,14 @@ class Table implements UserTableAction{
 				else{
 					
 					insertString += ", \""+fieldname+"\": \""+insertValue+"\"";
-					out.println(ClientHandler.WELCOMEWORD+ " 1 recorded added!");
-					
+
 				}
 			}
 			insertString +="}";
-			recordsTxt.add(insertString);
+			//recordsTxt.add(insertString);
 			MyJson newJson = new MyJson(insertString);
 			myjsons.add(newJson);
+			out.println(ClientHandler.WELCOMEWORD+ " 1 recorded added!");
 		 }catch(Exception e){
 			 this.recordID--;
 			 out.println(ClientHandler.WELCOMEWORD+"your input is invalid, please double check to match table structure");
@@ -262,6 +262,7 @@ class Table implements UserTableAction{
 	}
 	
 	//compare data with their true datatype
+	/*
 	public int dataCompare(String fieldName, String compare1, String compare2){
 		DataType dataType =  recordMeta.get(fieldName);
 		switch(dataType.type){
@@ -278,6 +279,7 @@ class Table implements UserTableAction{
 		}
 		
 	}
+	*/
 	
 	@Override
 	public ArrayList<String> searchRecord(Condition condition, PrintWriter out) {
@@ -533,7 +535,7 @@ class Table implements UserTableAction{
 			if(myjsons.size()<1) break;
 		}
 		
-		/*
+		/* removed below after refactor record from string array to MyJson Object array
 		JSONObject myJson;
 		for(String record: recordsTxt){
 			try {
@@ -581,6 +583,13 @@ class Table implements UserTableAction{
 			this.type=type;
 			this.length=length;
 		}
+	}
+
+
+
+	@Override
+	public int compareTo(Table o) {
+		return this.tableName.compareTo(o.tableName);
 	}
 
 

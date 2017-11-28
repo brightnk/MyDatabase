@@ -94,7 +94,10 @@ public class ClientHandler implements Runnable {
 		String[] commands = msg.split(" ");
 		Condition condition;
 		try{
-		switch(commands[0].toLowerCase()){		
+		switch(commands[0].toLowerCase()){	
+		
+		default: out.println("your input command is not valid, please double check");
+				break;
 		case "create":
 				switch(commands[1].toLowerCase()){
 				//create user - command: create user (username) (password) (boolean isadmin);
@@ -122,6 +125,8 @@ public class ClientHandler implements Runnable {
 					this.currentUser.createTable(tableName, out, newArguSet);
 
 					break;
+					default: out.println("your input command is not valid, please double check");
+						break;
 				
 				}
 			break;
@@ -147,9 +152,11 @@ public class ClientHandler implements Runnable {
 				case "record":
 							currentUser.deleteRecord(commands[4],commands[3],commands[5], out);
 					break;
+				default: out.println("your input command is not valid, please double check");	
+					break;
 				}
 			break;
-			
+				
 			
 		case "use":
 			switch(commands[1].toLowerCase()){
@@ -161,17 +168,18 @@ public class ClientHandler implements Runnable {
 					
 			case "table":
 				currentUser.selectedTable = currentUser.useTable(commands[2], out);
+				break;
+			default: out.println("your input command is not valid, please double check");
 			}
 			break;
+			
 			//select (field1),(field2),(field3) where (fieldname) (=><) (val);
 		case "select":
 			condition = new Condition();
 			condition.fieldName = commands[3];
 			condition.comparer = commands[4];
 			condition.condition = commands[5];
-			currentUser.displayRecord(currentUser.searchRecord(condition, out), out, commands[1].split(","));
-			
-			
+
 			break;
 			
 			//insert record - command: insert field1,field2,field3 value val1,val2,va3;
@@ -202,12 +210,12 @@ public class ClientHandler implements Runnable {
 					condition.comparer = commands[7];
 					condition.condition = commands[8];
 					currentUser.updateRecord(fieldname, newVal, condition, out);
-					
-					
+					break;
+				default: out.println("your input command is not valid, please double check");
+					break;
 					
 				}
 			break;
-
 		}
 		
 		DBHelper.writeToDB(mydb);

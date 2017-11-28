@@ -5,7 +5,7 @@ import java.util.HashMap;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class User{
+public class User implements Comparable<User>{
 
 	String name;
 	String password;
@@ -125,6 +125,15 @@ public class User{
 	//to do method
 	public void displayRecord(ArrayList<String> records, PrintWriter out, String...fieldNames) {
 			selectedTable.displayRecord(records, out, fieldNames);
+	}
+
+	@Override
+	public int compareTo(User o) {
+		// TODO Auto-generated method stub
+		
+		return this.name.compareTo(o.name);
+		
+
 	}
 	
 	

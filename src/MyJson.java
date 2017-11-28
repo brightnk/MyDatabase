@@ -21,12 +21,16 @@ public class MyJson implements Comparable<MyJson>{
 			
 			e.printStackTrace();
 			return null;
-		}
-		
-		
-		
-		
+		}	
 	}
+	
+	
+	public String toString(){
+		return this.data;
+	}
+	
+	
+	
 
 	@Override
 	public int compareTo(MyJson o) {
