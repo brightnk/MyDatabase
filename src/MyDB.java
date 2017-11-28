@@ -95,7 +95,7 @@ public class MyDB{
 				out.println(ClientHandler.WELCOMEWORD+"database created successfully");
 			}else{
 				out.println(ClientHandler.WELCOMEWORD+"The db name is already existing, please change");
-				Db.LASTID--;
+				;
 			}
 			
 			/*
@@ -121,7 +121,7 @@ public class MyDB{
 				currentUser.selectedDB = null;
 			}
 			dbsTree.remove(new Db(name), out);
-			Db.LASTID--;
+			
 		}else out.println(ClientHandler.WELCOMEWORD+"not admin");
 		
 		
@@ -150,6 +150,8 @@ class Db implements UserDBAction, Comparable<Db>{
 	int dbId;
 	String dbName;
 	ArrayList<Table> tables = new ArrayList<Table>(); 
+	MyBinaryTree<Table> tablesTree = new MyBinaryTree<Table>();
+	
 	
 	public Db(String name){
 		LASTID++;
@@ -159,41 +161,33 @@ class Db implements UserDBAction, Comparable<Db>{
 
 	@Override
 	public void addTable(String tableName, PrintWriter out, ArguSet... args) {
-		for(Table table:tables){
-			if(table.tableName.equals(tableName)){
-				out.println(ClientHandler.WELCOMEWORD+"The table is already existing, please change name");
-				return;
-			}
+		Table temp = new Table(tableName,args);
+		if(tablesTree.search(temp)==null){
+			tablesTree.add(temp);
+			out.println(ClientHandler.WELCOMEWORD+"add table successfully");
+		}else{
+			out.println(ClientHandler.WELCOMEWORD+"The table is already existing, please change name");
 		}
-		tables.add(new Table(tableName, args));
-		out.println(ClientHandler.WELCOMEWORD+"add table successfully");
 
 	}
 
 	@Override
 	public void removeTable(String name, PrintWriter out) {
-		
-		for(Table table:tables){
-			if(table.tableName.equals(name)){
-				tables.remove(table);
-				out.println(ClientHandler.WELCOMEWORD+"delete 1 table successfully");
-				return;
-			}
-		}
-		out.println(ClientHandler.WELCOMEWORD+"The table name is not exsiting");
+
+		tablesTree.remove(new Table(name), out);
 
 	}
 
 	@Override
 	public UserTableAction useTable(String name, PrintWriter out) {
-		for(Table table:tables){
-			if(table.tableName.equals(name)){
-				out.println(ClientHandler.WELCOMEWORD+"Now using table: "+ name);
-				return table;
-			}
+		
+		Table tempTable = tablesTree.search(new Table(name));
+		if (tempTable == null) out.println(ClientHandler.WELCOMEWORD+"The table name is not exsiting");
+		else{
+			out.println(ClientHandler.WELCOMEWORD+"Now using table: "+ name);
+			
 		}
-		out.println(ClientHandler.WELCOMEWORD+"The table name is not exsiting");
-		return null;
+		return tempTable;
 	}
 
 	@Override
