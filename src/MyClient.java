@@ -34,6 +34,7 @@ public class MyClient extends Thread
 		pw.close();
 		serverInput.close();
 		connectionSock.close();
+		this.interrupt();
 	}
 	public void sendData(String msg) {
 		pw.println(msg); 

@@ -47,13 +47,12 @@ public class MyBinaryTree<E extends Comparable<E>> implements Iterable<E>{
 	public E search(E e){
 		
 		
-		int compareCount = 0;
 		if(isEmpty()) return null;
 		
 		mover = root;
 		while(true){
 			if(mover.value.compareTo(e)==0){
-				compareCount++;
+				
 				return mover.value;
 				/*while(mover.nextLeft!=null &&mover.nextLeft.value.compareTo(e)==0){
 					compareCount++;
@@ -64,27 +63,27 @@ public class MyBinaryTree<E extends Comparable<E>> implements Iterable<E>{
 				
 			}
 			if(mover.value.compareTo(e)>0) {
-				compareCount++;
+				
 				if(mover.nextLeft!=null) {
 					mover=mover.nextLeft;
 					continue;
 				}
 				
 				else {
-					System.out.println("Compared times: "+compareCount);
+					
 					return null;
 				}
 			}
 			
 			
 			if(mover.value.compareTo(e)<0) 
-				compareCount++;
+				
 				if(mover.nextRight!=null) {
 					mover=mover.nextRight;
 					continue;
 				}
 				else {
-					System.out.println("Compared times: "+compareCount);
+					
 					return null;
 				}
 		}
@@ -94,6 +93,7 @@ public class MyBinaryTree<E extends Comparable<E>> implements Iterable<E>{
 	public void remove(E e, PrintWriter out){
 		recordfind=false;
 		root = deleteRec(root, e);
+		mover =root;
 		if(recordfind) out.println(ClientHandler.WELCOMEWORD+"delete successfully");
 		else out.println(ClientHandler.WELCOMEWORD+"no records found");
 	}

@@ -56,7 +56,7 @@ public class ClientHandler implements Runnable {
                 if (msg == null || msg.equals("@")) {
                     break;
                 }
-                
+                if(msg.isEmpty()) continue;
                 //here to deal with the input msg and call function
                 
                 System.out.println("Message from client #" + currentUser.name + ", [" + msg + "]");

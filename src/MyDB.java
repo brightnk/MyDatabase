@@ -7,14 +7,13 @@ import java.util.Map;
 import org.json.*;
 public class MyDB{
 	static boolean DBwritable = true;
-	ArrayList<User> users =new ArrayList<User>();
+
 	MyBinaryTree<User> usersTree =  new MyBinaryTree<User>();
 	MyBinaryTree<Db> dbsTree =  new MyBinaryTree<Db>();
-	ArrayList<Db> dbs = new ArrayList<Db>();	
+
 	public MyDB(){
 		
 		User defaultUser = new User("admin", "admin", true);
-		users.add(defaultUser);
 		usersTree.add(defaultUser);
 	}
 	
@@ -25,7 +24,10 @@ public class MyDB{
 		User temp = new User(name,password,false);
 		User result = usersTree.search(temp);
 		if(result==null) return null;
-		if(result.password.equals(password)) return result;
+		if(result.password.equals(password)) {
+			result.canLogin=false;
+			return result;
+		}
 		else return null;
 
 		/*
@@ -86,14 +88,26 @@ public class MyDB{
 	public void createDB(User currentUser, String name, PrintWriter out) {
 		
 		if(currentUser.isAdmin){
-			for(Db db:dbs){
+			
+			Db temp = new Db(name);
+			if(dbsTree.search(temp)==null){
+				dbsTree.add(temp);
+				out.println(ClientHandler.WELCOMEWORD+"database created successfully");
+			}else{
+				out.println(ClientHandler.WELCOMEWORD+"The db name is already existing, please change");
+				Db.LASTID--;
+			}
+			
+			/*
+			 * before change dbs to BTS.
+			 * for(Db db:dbs){
 				if(db.dbName.equals(name)){
 					out.println(ClientHandler.WELCOMEWORD+"The db name is already existing, please change");
 					return;
 				}
 			}
 			dbs.add(new Db(name));
-			out.println(ClientHandler.WELCOMEWORD+"database created successfully");
+			out.println(ClientHandler.WELCOMEWORD+"database created successfully");*/
 		}else out.println(ClientHandler.WELCOMEWORD+"you are not admin");
 		
 	}
@@ -106,13 +120,8 @@ public class MyDB{
 				currentUser.selectedDBname=null;
 				currentUser.selectedDB = null;
 			}
-			for(Db db:dbs){
-				if(db.dbName.equals(name)){
-					dbs.remove(db);
-					return;
-				}
-			}
-			out.println(ClientHandler.WELCOMEWORD+"The db name is not exsiting");
+			dbsTree.remove(new Db(name), out);
+			Db.LASTID--;
 		}else out.println(ClientHandler.WELCOMEWORD+"not admin");
 		
 		
@@ -122,15 +131,11 @@ public class MyDB{
 
 	
 	public UserDBAction useDB(String name, PrintWriter out) {
-		for(Db db:dbs){
-			if(db.dbName.equals(name)){
-				
-				out.println(ClientHandler.WELCOMEWORD+"now using database: "+db.dbName);
-				return db;
-			}
-		}
-		out.println(ClientHandler.WELCOMEWORD+"The db name is not exsiting");
-		return null;
+		Db temp =dbsTree.search(new Db(name));
+		if(temp==null) out.println(ClientHandler.WELCOMEWORD+"The db name is not exsiting");
+		else out.println(ClientHandler.WELCOMEWORD+"now using database: "+temp.dbName);
+
+		return temp;
 	}
 	
 }

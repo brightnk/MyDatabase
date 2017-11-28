@@ -28,7 +28,7 @@ public class DBHelper {
 			MyDB mydb = new MyDB();
 			JsonReader reader = new JsonReader(new FileReader(DBFILENAME));
 			mydb = gson.fromJson(reader, MyDB.class);
-			for(User user : mydb.users) user.canLogin =true;
+			for(User user : mydb.usersTree) user.canLogin =true;
 			
 			return mydb;
 		} catch (FileNotFoundException e) {

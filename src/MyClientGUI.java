@@ -58,6 +58,10 @@ public class MyClientGUI extends JFrame{
 							messages +="Connection made, try login.. \n";
 							myclient.start();
 							
+							for( ActionListener al : btnSend.getActionListeners() ) {
+								btnSend.removeActionListener( al );
+							}
+							
 							
 							btnSend.addActionListener(new ActionListener(){
 								String userinput;
