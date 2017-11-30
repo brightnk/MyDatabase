@@ -1,6 +1,7 @@
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -279,8 +280,22 @@ class Table implements UserTableAction, Comparable<Table>{
 		
 	}
 	*/
-	
 	@Override
+	public ArrayList<String> showAllRecords(PrintWriter out){
+		ArrayList<String> allrecord = new ArrayList<String>();
+		
+		for(MyJson record: myjsons){
+			allrecord.add(record.data);
+			
+		}
+		out.println(ClientHandler.WELCOMEWORD+allrecord.size()+" records are founded");
+		return allrecord;
+	}
+	
+	
+	
+	
+	
 	public ArrayList<String> searchRecord(Condition condition, PrintWriter out) {
 		ArrayList<String> afterSearch =new ArrayList<String>();
 		MyJson tempJson = new MyJson("{\""+ condition.fieldName +"\": \""+ condition.condition+"\"}");
@@ -341,11 +356,15 @@ class Table implements UserTableAction, Comparable<Table>{
 			
 		}*/ 
 		if(afterSearch.size()>0){
-			out.println(ClientHandler.WELCOMEWORD+afterSearch.size()+"records are founded");
+			out.println(ClientHandler.WELCOMEWORD+afterSearch.size()+" records are founded");
 		}else out.println(afterSearch.size()+ "no record founded");
 		return afterSearch;
 		
 	}
+	
+	
+	
+	
 
 	@Override
 	public void displayRecord(ArrayList<String> records, PrintWriter out,String...fieldNames){
@@ -411,23 +430,23 @@ class Table implements UserTableAction, Comparable<Table>{
 					count ++;
 				}
 				break;
-			case "<":if(record.compareTo(tempJson)<0) record.data = record.updateRecord(fieldName, newValue);
-				count ++;
+			case "<":if(record.compareTo(tempJson)<0) {record.data = record.updateRecord(fieldName, newValue);
+				count ++;}
 				break;
-			case "=":if(record.compareTo(tempJson)==0) record.data = record.updateRecord(fieldName, newValue);
-				count ++;
+			case "=":if(record.compareTo(tempJson)==0) {record.data = record.updateRecord(fieldName, newValue);
+				count ++;}
 				break;
 			case ">=":
-				if(record.compareTo(tempJson)>=0) record.data = record.updateRecord(fieldName, newValue);
-				count ++;
+				if(record.compareTo(tempJson)>=0) {record.data = record.updateRecord(fieldName, newValue);
+				count ++;}
 				break;
 			case "<=":
-				if(record.compareTo(tempJson)<=0) record.data = record.updateRecord(fieldName, newValue);
-				count ++;
+				if(record.compareTo(tempJson)<=0) {record.data = record.updateRecord(fieldName, newValue);
+				count ++;}
 				break;
 			case "!=":
-				if(record.compareTo(tempJson)!=0) record.data = record.updateRecord(fieldName, newValue);
-				count ++;
+				if(record.compareTo(tempJson)!=0) {record.data = record.updateRecord(fieldName, newValue);
+				count ++;}
 				break;
 			}
 		}
@@ -506,29 +525,30 @@ class Table implements UserTableAction, Comparable<Table>{
 		MyJson.typeCmp = recordMeta.get(fieldName).type;
 		MyJson.fieldNameCmp = fieldName;
 		int count=0;
-		for(MyJson record: myjsons){
+		for(Iterator<MyJson> iterator = myjsons.iterator(); iterator.hasNext(); ){
+			MyJson record = iterator.next();
 			switch(comparer){			
 			case ">": 
-				if(record.compareTo(tempJson)>0) myjsons.remove(record);
-				count++;
+				if(record.compareTo(tempJson)>0){ iterator.remove();
+				count++;}
 				break;
-			case "<":if(record.compareTo(tempJson)<0) myjsons.remove(record);
-				count++;
+			case "<":if(record.compareTo(tempJson)<0){ iterator.remove();
+				count++;}
 				break;
-			case "=":if(record.compareTo(tempJson)==0) myjsons.remove(record);
-			count++;
+			case "=":if(record.compareTo(tempJson)==0) {iterator.remove();
+			count++;}
 				break;
 			case ">=":
-				if(record.compareTo(tempJson)>=0) myjsons.remove(record);
-				count++;
+				if(record.compareTo(tempJson)>=0) {iterator.remove();
+				count++;}
 				break;
 			case "<=":
-				if(record.compareTo(tempJson)<=0) myjsons.remove(record);
-				count++;
+				if(record.compareTo(tempJson)<=0) {iterator.remove();
+				count++;}
 				break;
 			case "!=":
-				if(record.compareTo(tempJson)!=0) myjsons.remove(record);
-				count++;
+				if(record.compareTo(tempJson)!=0) {iterator.remove();
+				count++;}
 				break;
 			}
 			if(myjsons.size()<1) break;

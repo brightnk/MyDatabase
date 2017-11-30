@@ -109,7 +109,9 @@ public class User implements Comparable<User>{
 	public ArrayList<String> searchRecord(Condition condition, PrintWriter out){
 		return selectedTable.searchRecord(condition, out);
 	}
-	
+	public ArrayList<String> showAllRecords(PrintWriter out){
+		return selectedTable.showAllRecords(out);
+	}
 	
 	public void updateRecord(String fieldName, String newValue, Condition condition, PrintWriter out){
 		selectedTable.updateRecord(fieldName, newValue, condition, out);
@@ -169,6 +171,7 @@ interface UserTableAction{
 	
 	
 	ArrayList<String> searchRecord(Condition condition, PrintWriter out);
+	ArrayList<String> showAllRecords(PrintWriter out);
 	void insertRecord(HashMap<String, String> insertMap, PrintWriter out);
 	void updateRecord(String fieldName, String newValue, Condition condition, PrintWriter out);
 	void displayRecord(ArrayList<String> records, PrintWriter out,String...fieldName);

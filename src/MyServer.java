@@ -21,18 +21,32 @@ import com.google.gson.stream.JsonReader;
 public class MyServer extends JFrame{
 	
 	
-	JLabel labelPort, labelReceive, labelResult;
+	JLabel labelPort, labelReceive;
 	JTextField txtPort;
-	JTextArea txtReceive, txtResult;
+	JTextArea txtReceive, labelCommand;
 	JButton btnBind;
 	ServerSocket serverSock = null;
 	Thread server;
 	ArrayList<String> userInputs = new ArrayList<String>();
 	MyDB mydb;
+	String acceptableCommands = "*Notice the space in command, but no space around ','\n"
+			+ "**() means it's a varaible, no need to key in--except the () around 'length'.\n\n"
+			+ "create user - command: \ncreate user (username) (password) (boolean isadmin) \n"
+			+ "create database -command: \ncreate database (databaseName) \n"
+			+ "create table -command: \ncreate table (tableName) (fieldName:fieldtype(length)),(fieldName2:fieldtype2\n(length2))...\n"
+			+ "delete user - command: \ndelete user (username) \n"
+			+ "delete user - command: \ndelete database (databaseName) \n"
+			+ "delete table - command: \ndelete table (tableName) \n"
+			+ "delete record - command:\ndelete record where (fieldName) (=,>,<) (value) -one condition allowed so far\n"
+			+ "use database - command: \nuse database (databaseName) \n"
+			+ "search record - command: \nselect (field1),(field2),(field3) where (fieldname) (=><) (val) -one condition allowed so far\n"
+			+ "insert record - command: \ninsert field1,field2,field3 value val1,val2,va3 \n"
+			+ "update user - command: \nupdate user (username) with (newUsername) (newPassword) (boolean isAdmin) \n"
+			+ "update record - command: \nupdate record (fieldname) with (newVal) where (fieldname2) (=><) (val)";
 	
 	public MyServer(){
 		super("My Server");
-		this.setBounds(50, 50, 500, 500);
+		this.setBounds(50, 50, 600, 850);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setVisible(true);
 		this.setLayout(null);
@@ -42,20 +56,18 @@ public class MyServer extends JFrame{
 		btnBind = new JButton("Start Server");
 		this.addView(btnBind, 250, 50, 100, 20);
 		labelReceive = new JLabel("Receive:");
-		labelResult = new JLabel("Result:");
-		this.addView(labelReceive, 50, 100, 50, 20);
-		this.addView(labelResult, 250, 100, 50, 20);
+		labelCommand = new JTextArea();
+		labelCommand.setText(acceptableCommands);
+		labelCommand.setEditable(false);
+		this.addView(labelReceive, 50, 100, 250, 20);
+		this.addView(labelCommand, 50, 330, 500, 450);
 		
 		txtReceive = new JTextArea();
 		txtReceive.setEditable(false);
-		txtResult = new JTextArea();
-		txtResult.setEditable(false);
 		JScrollPane scroll1 = new JScrollPane (txtReceive);
-		this.addView(scroll1, 50, 150, 150, 200);
+		this.addView(scroll1, 50, 120, 500, 200);
 	    scroll1.setVerticalScrollBarPolicy ( ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS );
-	    JScrollPane scroll2 = new JScrollPane (txtResult);
-	    this.addView(scroll2, 250, 150, 150, 200);
-	    scroll2.setVerticalScrollBarPolicy ( ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS );
+
 		
 
 	    
@@ -145,11 +157,6 @@ public class MyServer extends JFrame{
 		txtReceive.setText(received);
 	    Collections.sort(numbers);
 		
-	    String results = "";
-	    for(int i=0; i<numbers.size();i++){
-	    	results += Integer.toString(numbers.get(i))+ "\n";
-	    }
-		txtResult.setText(results);
 	}
 	
 

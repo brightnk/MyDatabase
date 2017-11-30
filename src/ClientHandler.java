@@ -61,7 +61,7 @@ public class ClientHandler implements Runnable {
                 
                 System.out.println("Message from client #" + currentUser.name + ", [" + msg + "]");
                 inputmsgHandler(msg);
-                myServer.userInputs.add(msg);
+                myServer.userInputs.add(currentUser.name + ": "+msg);
                 myServer.updateText();
             }
         } catch (IOException e) {
@@ -153,7 +153,7 @@ public class ClientHandler implements Runnable {
 							currentUser.deleteRecord(commands[4],commands[3],commands[5], out);
 					break;
 				default: out.println("your input command is not valid, please double check");	
-					break;
+				break;
 				}
 			break;
 				
@@ -176,10 +176,15 @@ public class ClientHandler implements Runnable {
 			//select (field1),(field2),(field3) where (fieldname) (=><) (val);
 		case "select":
 			condition = new Condition();
+			if(commands.length <=2){
+				
+				currentUser.displayRecord(currentUser.showAllRecords(out), out, commands[1].split(","));
+			}else{
 			condition.fieldName = commands[3];
 			condition.comparer = commands[4];
 			condition.condition = commands[5];
-
+			currentUser.displayRecord(currentUser.searchRecord(condition, out), out, commands[1].split(","));
+			}
 			break;
 			
 			//insert record - command: insert field1,field2,field3 value val1,val2,va3;

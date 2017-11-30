@@ -4,6 +4,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 
 import javax.swing.*;
+import javax.swing.text.DefaultCaret;
 
 public class MyClientGUI extends JFrame{
 	
@@ -39,6 +40,8 @@ public class MyClientGUI extends JFrame{
 		this.addView(labelMessage, 50, 120, 100, 20);
 		txtMessage = new JTextArea();
 		txtMessage.setEditable(false);
+		//always scroll to buttom when input
+		((DefaultCaret)txtMessage.getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 		JScrollPane scroll = new JScrollPane (txtMessage);
 		this.addView(scroll, 50, 150, 500, 300);
 		scroll.setVerticalScrollBarPolicy ( ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS );
@@ -70,10 +73,15 @@ public class MyClientGUI extends JFrame{
 									if(myclient.ok_connect){
 										
 										userinput = txtSend.getText().toString();
+										if(userinput.equals("clear")){
+											messages ="";
+											updateMessage();
+										}else{
 										txtSend.setText("");
 										messages +=userinput+"\n";
 										myclient.sendData(userinput);
 										updateMessage();
+										}
 									}
 									
 								}
